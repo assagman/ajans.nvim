@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
 
+set -o pipefail
+
+if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+  log="${RUNNER_TEMP:-/tmp}/ajans-test.log"
+  nvim -l tests/minit.lua --minitest "$@" 2>&1 | tee "$log"
+  status=${PIPESTATUS[0]}
+  if [[ $status -ne 0 ]]; then
+    while IFS= read -r line; do
+      printf '::error::%s\n' "$line"
+    done < <(tail -200 "$log")
+  fi
+  exit "$status"
+fi
+
 nvim -l tests/minit.lua --minitest "$@"
