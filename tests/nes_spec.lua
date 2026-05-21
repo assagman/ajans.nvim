@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local Config = require("sidekick.config")
-local Nes = require("sidekick.nes")
+local Config = require("ajans.config")
+local Nes = require("ajans.nes")
 
 describe("nes enabled option", function()
   local buf
@@ -12,16 +12,16 @@ describe("nes enabled option", function()
     buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "local foo" })
     vim.api.nvim_set_current_buf(buf)
-    vim.g.sidekick_nes = nil
-    vim.b[buf].sidekick_nes = nil
+    vim.g.ajans_nes = nil
+    vim.b[buf].ajans_nes = nil
   end)
 
   after_each(function()
     if vim.api.nvim_buf_is_valid(buf) then
       vim.api.nvim_buf_delete(buf, { force = true })
     end
-    vim.g.sidekick_nes = nil
-    vim.b.sidekick_nes = nil
+    vim.g.ajans_nes = nil
+    vim.b.ajans_nes = nil
     Config.nes.enabled = original_enabled
     Nes._edits = {}
   end)
@@ -31,19 +31,19 @@ describe("nes enabled option", function()
   end)
 
   it("honors global toggle", function()
-    vim.g.sidekick_nes = false
+    vim.g.ajans_nes = false
     assert.is_false(Config.nes.enabled(buf))
   end)
 
   it("honors buffer toggle", function()
-    vim.b[buf].sidekick_nes = false
+    vim.b[buf].ajans_nes = false
     assert.is_false(Config.nes.enabled(buf))
   end)
 
   it("filters pending edits when disabled", function()
     local version = vim.lsp.util.buf_versions[buf] or 0
     vim.lsp.util.buf_versions[buf] = version
-    ---@type sidekick.NesEdit
+    ---@type ajans.NesEdit
     Nes._edits = {
       {
         buf = buf,
@@ -59,7 +59,7 @@ describe("nes enabled option", function()
       },
     }
 
-    vim.g.sidekick_nes = false
+    vim.g.ajans_nes = false
     assert.are.same({}, Nes.get(buf))
   end)
 end)

@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local Config = require("sidekick.config")
-local Context = require("sidekick.cli.context")
+local Config = require("ajans.config")
+local Context = require("ajans.cli.context")
 
 describe("context module", function()
   local buf, win
@@ -18,7 +18,7 @@ describe("context module", function()
     vim.bo[buf].filetype = "lua"
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
-    vim.w[win].sidekick_visit = vim.uv.hrtime()
+    vim.w[win].ajans_visit = vim.uv.hrtime()
   end)
 
   after_each(function()
@@ -39,9 +39,9 @@ describe("context module", function()
       assert.is_not_nil(ctx.cwd)
     end)
 
-    it("excludes sidekick_terminal buffers", function()
+    it("excludes ajans_terminal buffers", function()
       local term_buf = vim.api.nvim_create_buf(false, true)
-      vim.bo[term_buf].filetype = "sidekick_terminal"
+      vim.bo[term_buf].filetype = "ajans_terminal"
       local term_win = vim.api.nvim_open_win(term_buf, true, {
         relative = "editor",
         width = 50,
@@ -49,7 +49,7 @@ describe("context module", function()
         row = 0,
         col = 0,
       })
-      vim.w[term_win].sidekick_visit = vim.uv.hrtime() + 1000000000
+      vim.w[term_win].ajans_visit = vim.uv.hrtime() + 1000000000
 
       local ctx = Context.ctx()
       -- Should still return the original window, not the terminal
@@ -71,7 +71,7 @@ describe("context module", function()
       })
 
       -- Mark win2 as more recently visited
-      vim.w[win2].sidekick_visit = vim.uv.hrtime() + 1000000000
+      vim.w[win2].ajans_visit = vim.uv.hrtime() + 1000000000
 
       local ctx = Context.ctx()
       assert.are.equal(win2, ctx.win)
@@ -151,7 +151,7 @@ describe("context module", function()
         vim.fn.bufload(file_buf)
         vim.bo[file_buf].buflisted = true
         vim.api.nvim_win_set_buf(win, file_buf)
-        vim.w[win].sidekick_visit = vim.uv.hrtime()
+        vim.w[win].ajans_visit = vim.uv.hrtime()
 
         local ctx = Context.get()
         local result = ctx:get("file")
@@ -322,7 +322,7 @@ describe("context module", function()
         vim.bo[file_buf].buflisted = true
         vim.api.nvim_win_set_buf(win, file_buf)
         vim.api.nvim_win_set_cursor(win, { 1, 0 })
-        vim.w[win].sidekick_visit = vim.uv.hrtime()
+        vim.w[win].ajans_visit = vim.uv.hrtime()
 
         local ctx = Context.get()
         local text = ctx:render("check {this}")
@@ -379,7 +379,7 @@ describe("context module", function()
         vim.fn.bufload(file_buf)
         vim.api.nvim_win_set_buf(win, file_buf)
         vim.api.nvim_win_set_cursor(win, { 2, 0 })
-        vim.w[win].sidekick_visit = vim.uv.hrtime()
+        vim.w[win].ajans_visit = vim.uv.hrtime()
 
         local ctx_data = Context.ctx()
         local result = Context.context.position(ctx_data)
@@ -404,7 +404,7 @@ describe("context module", function()
         local file_buf = vim.fn.bufadd(tmp)
         vim.fn.bufload(file_buf)
         vim.api.nvim_win_set_buf(win, file_buf)
-        vim.w[win].sidekick_visit = vim.uv.hrtime()
+        vim.w[win].ajans_visit = vim.uv.hrtime()
 
         local ctx_data = Context.ctx()
         local result = Context.context.file(ctx_data)
@@ -442,7 +442,7 @@ describe("context module", function()
     end)
 
     describe("quickfix", function()
-      local Text = require("sidekick.text")
+      local Text = require("ajans.text")
 
       before_each(function()
         vim.fn.setqflist({}, "r", { items = {} })
@@ -535,7 +535,7 @@ describe("context module", function()
         vim.api.nvim_win_set_cursor(win, { 1, 6 })
 
         local ctx_data = Context.ctx()
-        local result = require("sidekick.cli.context.selection").get(ctx_data)
+        local result = require("ajans.cli.context.selection").get(ctx_data)
 
         assert.is_not_nil(result)
 

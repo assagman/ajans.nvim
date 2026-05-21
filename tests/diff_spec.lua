@@ -1,8 +1,8 @@
 ---@module 'luassert'
 
-local Config = require("sidekick.config")
-local Diff = require("sidekick.nes.diff")
-local TS = require("sidekick.treesitter")
+local Config = require("ajans.config")
+local Diff = require("ajans.nes.diff")
+local TS = require("ajans.treesitter")
 
 local function stub_ts()
   local original = {
@@ -67,7 +67,7 @@ describe("diff", function()
     Config.nes.diff.inline = inline_default
   end)
 
-  ---@type {name:string, lines?:string[], inline?:"words"|"chars"|false, edit:{from:{integer,integer}, to:{integer,integer}, text:string}, check:fun(diff:sidekick.Diff, calls:{highlight_ws:table[]})}[]
+  ---@type {name:string, lines?:string[], inline?:"words"|"chars"|false, edit:{from:{integer,integer}, to:{integer,integer}, text:string}, check:fun(diff:ajans.Diff, calls:{highlight_ws:table[]})}[]
   local cases = {
     {
       name = "inline word change",
@@ -87,12 +87,12 @@ describe("diff", function()
           row = 0,
           col = 6,
           end_col = 9,
-          hl_group = "SidekickDiffDelete",
+          hl_group = "AjansDiffDelete",
         }, hunk.extmarks[1])
         assert.are.same({
           row = 0,
           col = 9,
-          virt_text = { { "food", "SidekickDiffAdd" } },
+          virt_text = { { "food", "AjansDiffAdd" } },
           virt_text_pos = "inline",
         }, hunk.extmarks[2])
         assert.are.same(0, #calls.highlight_ws)
@@ -112,7 +112,7 @@ describe("diff", function()
         assert.are.same("change", hunk.kind)
         assert.are.same({ 0, 0 }, hunk.pos)
         assert.are.same(2, #hunk.extmarks)
-        assert.are.same("SidekickDiffDelete", hunk.extmarks[1].line_hl_group)
+        assert.are.same("AjansDiffDelete", hunk.extmarks[1].line_hl_group)
         assert.are.same(1, #calls.highlight_ws)
       end,
     },
@@ -132,9 +132,9 @@ describe("diff", function()
         assert.are.same(2, #hunk.extmarks)
         assert.is_true(hunk.extmarks[2].hl_eol)
         assert.are.same({
-          leading = "SidekickDiffContext",
-          trailing = "SidekickDiffContext",
-          block = "SidekickDiffAdd",
+          leading = "AjansDiffContext",
+          trailing = "AjansDiffContext",
+          block = "AjansDiffAdd",
           width = 33,
         }, calls.highlight_ws[1].opts)
       end,
@@ -159,7 +159,7 @@ describe("diff", function()
           row = 0,
           col = 11,
           end_col = 12,
-          hl_group = "SidekickDiffDelete",
+          hl_group = "AjansDiffDelete",
         }, delete.extmarks[1])
 
         local add = diff.hunks[2]
@@ -170,7 +170,7 @@ describe("diff", function()
         assert.is_true(add.extmarks[1].hl_eol)
         assert.are.same(1, #calls.highlight_ws)
         assert.are.same({ {
-          { "21", "SidekickDiffAdd" },
+          { "21", "AjansDiffAdd" },
         } }, calls.highlight_ws[1].lines)
       end,
     },
@@ -190,7 +190,7 @@ describe("diff", function()
         assert.are.same({
           row = 0,
           col = 9,
-          virt_text = { { "d", "SidekickDiffAdd" } },
+          virt_text = { { "d", "AjansDiffAdd" } },
           virt_text_pos = "inline",
         }, hunk.extmarks[1])
       end,
@@ -213,9 +213,9 @@ describe("diff", function()
           row = 0,
           col = 0,
           virt_text = {
-            { "-", "SidekickDiffAdd" },
-            { "-", "SidekickDiffAdd" },
-            { " ", "SidekickDiffAdd" },
+            { "-", "AjansDiffAdd" },
+            { "-", "AjansDiffAdd" },
+            { " ", "AjansDiffAdd" },
           },
           virt_text_pos = "inline",
         }, hunk.extmarks[1])
@@ -239,8 +239,8 @@ describe("diff", function()
           row = 0,
           col = 13,
           virt_text = {
-            { " ", "SidekickDiffAdd" },
-            { "bar", "SidekickDiffAdd" },
+            { " ", "AjansDiffAdd" },
+            { "bar", "AjansDiffAdd" },
           },
           virt_text_pos = "inline",
         }, hunk.extmarks[1])
@@ -264,7 +264,7 @@ describe("diff", function()
         assert.are.same(1, #hunk.extmarks)
         assert.is_true(hunk.extmarks[1].hl_eol)
         assert.are.same({ {
-          { "bar", "SidekickDiffAdd" },
+          { "bar", "AjansDiffAdd" },
         } }, hunk.extmarks[1].virt_lines)
       end,
     },
@@ -285,7 +285,7 @@ describe("diff", function()
         assert.are.same(1, #hunk.extmarks)
         assert.is_true(hunk.extmarks[1].hl_eol)
         assert.are.same({ {
-          { "foo", "SidekickDiffAdd" },
+          { "foo", "AjansDiffAdd" },
         } }, calls.highlight_ws[1].lines)
       end,
     },
@@ -314,7 +314,7 @@ describe("diff", function()
       vim.api.nvim_buf_delete(buf, { force = true })
       restore()
       assert(ok, diff)
-      diff = diff ---@type sidekick.Diff
+      diff = diff ---@type ajans.Diff
       case.check(diff, calls)
     end)
   end

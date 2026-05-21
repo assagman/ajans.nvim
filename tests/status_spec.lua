@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local Config = require("sidekick.config")
-local Status = require("sidekick.status")
+local Config = require("ajans.config")
+local Status = require("ajans.status")
 
 describe("status handler", function()
   local notify
@@ -9,10 +9,10 @@ describe("status handler", function()
   local orig_get_client
 
   before_each(function()
-    orig_notify = require("sidekick.util").notify
+    orig_notify = require("ajans.util").notify
     orig_get_client = Config.get_client
     notify = {}
-    require("sidekick.util").notify = function(msg, level)
+    require("ajans.util").notify = function(msg, level)
       table.insert(notify, { msg = msg, level = level })
     end
     Config.get_client = function()
@@ -21,7 +21,7 @@ describe("status handler", function()
   end)
 
   after_each(function()
-    require("sidekick.util").notify = orig_notify
+    require("ajans.util").notify = orig_notify
     Config.get_client = orig_get_client
   end)
 
