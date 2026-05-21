@@ -331,8 +331,8 @@ Default settings ~
             size = 0.5, -- size of the split (0-1 for percentage)
           },
         },
-        --- Actual cli tool config is loaded from the runtime path `sk/cli/{tool}.lua` and merged with the config below.
-        --- For default configs, see https://github.com/assagman/ajans.nvim/tree/main/sk/cli
+        --- Actual cli tool config is loaded from the runtime path `aj/cli/{tool}.lua` and merged with the config below.
+        --- For default configs, see https://github.com/assagman/ajans.nvim/tree/main/aj/cli
         ---@type table<string, ajans.cli.Config|{}>
         tools = {
           aider    = {},

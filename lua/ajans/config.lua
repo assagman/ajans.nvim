@@ -99,8 +99,8 @@ local defaults = {
       -- more lines means slower loading of the scrollback
       dump = 2000,
     },
-    --- Actual cli tool config is loaded from the runtime path `sk/cli/{tool}.lua` and merged with the config below.
-    --- For default configs, see https://github.com/assagman/ajans.nvim/tree/main/sk/cli
+    --- Actual cli tool config is loaded from the runtime path `aj/cli/{tool}.lua` and merged with the config below.
+    --- For default configs, see https://github.com/assagman/ajans.nvim/tree/main/aj/cli
     -- stylua: ignore
     ---@type table<string, ajans.cli.Config|{}>
     tools = {

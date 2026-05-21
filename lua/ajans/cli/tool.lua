@@ -10,7 +10,7 @@ M.__index = M
 ---@type table<string,ajans.cli.Config>
 local base = setmetatable({}, {
   __index = function(t, key)
-    local f = vim.api.nvim_get_runtime_file("sk/cli/" .. key .. ".lua", false)[1]
+    local f = vim.api.nvim_get_runtime_file("aj/cli/" .. key .. ".lua", false)[1]
     if f then
       local ok, ret = pcall(dofile, f)
       if ok and type(ret) == "table" then
