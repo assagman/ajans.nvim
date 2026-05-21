@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local Commands = require("sidekick.commands")
-local Util = require("sidekick.util")
+local Commands = require("ajans.commands")
+local Util = require("ajans.util")
 
 local function capture_errors()
   local errors = {}
@@ -135,17 +135,17 @@ describe("commands", function()
     local cases = {
       {
         name = "strips command prefix",
-        input = "Sidekick ",
+        input = "Ajans ",
         expected = { "cli", "nes" },
       },
       {
         name = "suggests subcommands",
-        input = "Sidekick cli s",
+        input = "Ajans cli s",
         expected = { "select", "show", "send" },
       },
       {
         name = "returns empty when no matches",
-        input = "Sidekick unknown",
+        input = "Ajans unknown",
         expected = {},
       },
     }

@@ -1,10 +1,10 @@
 # Agent Cheat Sheet
 
-This repository contains `sidekick.nvim`, a Neovim plugin that integrates GitHub Copilot "Next Edit Suggestions" (NES) into Neovim. The plugin relies on Copilot's LSP and ships with an automated test + docs workflow.
+This repository contains `ajans.nvim`, a Neovim plugin that integrates GitHub Copilot "Next Edit Suggestions" (NES) into Neovim. The plugin relies on Copilot's LSP and ships with an automated test + docs workflow.
 
 ## Project Overview
 
-- Core modules live under `lua/sidekick/` (`config.lua`, `nes/`, `status.lua`, etc.).
+- Core modules live under `lua/ajans/` (`config.lua`, `nes/`, `status.lua`, etc.).
 - Tests are written with `mini.test` and live in `tests/`. Specs are table-driven whenever possible.
 - Docs are generated automatically via `./scripts/docs`, which extracts Lua annotations to update `README.md` sections.
 - Code style is Lua with `stylua` / `selene` configs already included.
@@ -31,9 +31,9 @@ This repository contains `sidekick.nvim`, a Neovim plugin that integrates GitHub
 
 ## Adding Features
 
-- Respect the `Config.nes.enabled` callback so that users can disable NES globally (`vim.g.sidekick_nes = false`) or per-buffer (`vim.b[buf].sidekick_nes = false`).
-- Keep new configuration options documented in `lua/sidekick/config.lua`; docs are generated from this file.
-- When touching the diffing logic (`lua/sidekick/nes/diff.lua`), update or add table-driven tests in `tests/diff_spec.lua`.
+- Respect the `Config.nes.enabled` callback so that users can disable NES globally (`vim.g.ajans_nes = false`) or per-buffer (`vim.b[buf].ajans_nes = false`).
+- Keep new configuration options documented in `lua/ajans/config.lua`; docs are generated from this file.
+- When touching the diffing logic (`lua/ajans/nes/diff.lua`), update or add table-driven tests in `tests/diff_spec.lua`.
 - If a change affects status reporting, extend `tests/status_spec.lua` so notifications stay covered.
 
 ## Writing Tests
@@ -51,10 +51,10 @@ This repository contains `sidekick.nvim`, a Neovim plugin that integrates GitHub
 
 ## Useful Paths
 
-- Core diff logic: `lua/sidekick/nes/diff.lua`
-- NES orchestration: `lua/sidekick/nes/init.lua`
-- Treesitter helpers: `lua/sidekick/treesitter.lua`
-- Status integration: `lua/sidekick/status.lua`
+- Core diff logic: `lua/ajans/nes/diff.lua`
+- NES orchestration: `lua/ajans/nes/init.lua`
+- Treesitter helpers: `lua/ajans/treesitter.lua`
+- Status integration: `lua/ajans/status.lua`
 - Tests entry point: `tests/minit.lua`
 
 Keep this sheet handy when automating changes or onboarding new agents.

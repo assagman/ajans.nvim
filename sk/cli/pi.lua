@@ -1,4 +1,4 @@
----@type sidekick.cli.Config
+---@type ajans.cli.Config
 return {
   cmd = { "pi" },
   is_proc = "\\<pi\\>",

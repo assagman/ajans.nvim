@@ -1,4 +1,4 @@
----@type sidekick.cli.Config
+---@type ajans.cli.Config
 return {
   cmd = { "claude" },
   is_proc = "\\<claude\\>",
@@ -6,11 +6,11 @@ return {
   resume = { "--resume" },
   continue = { "--continue" },
   format = function(text)
-    local Text = require("sidekick.text")
+    local Text = require("ajans.text")
 
     Text.transform(text, function(str)
       return str:find("[^%w/_%.%-]") and ('"' .. str .. '"') or str
-    end, "SidekickLocFile")
+    end, "AjansLocFile")
 
     local ret = Text.to_string(text)
 

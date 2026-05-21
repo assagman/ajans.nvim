@@ -1,7 +1,7 @@
 ---@module 'luassert'
 
-local Context = require("sidekick.cli.context")
-local TextObject = require("sidekick.cli.context.textobject")
+local Context = require("ajans.cli.context")
+local TextObject = require("ajans.cli.context.textobject")
 
 local function pending(msg)
   print("PENDING: " .. msg)
@@ -15,7 +15,7 @@ describe("textobject context", function()
     buf = vim.api.nvim_create_buf(false, true)
     win = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_buf(win, buf)
-    vim.w[win].sidekick_visit = vim.uv.hrtime()
+    vim.w[win].ajans_visit = vim.uv.hrtime()
   end)
 
   after_each(function()

@@ -1,6 +1,6 @@
 local re = vim.regex("\\<copilot\\>")
 
----@type sidekick.cli.Config
+---@type ajans.cli.Config
 return {
   cmd = { "copilot", "--banner" },
   is_proc = function(_, proc)

@@ -1,4 +1,4 @@
----@class sidekick.cli.session.Opencode: sidekick.cli.Session
+---@class ajans.cli.session.Opencode: ajans.cli.Session
 ---@field port number
 ---@field pid number
 ---@field base_url string
@@ -8,8 +8,8 @@ M.priority = 20
 M.external = true
 
 function M.sessions()
-  local Procs = require("sidekick.cli.procs")
-  local Util = require("sidekick.util")
+  local Procs = require("ajans.cli.procs")
+  local Util = require("ajans.util")
 
   -- Get listening port for this PID
   -- Get all listening ports with PIDs in one call
@@ -32,7 +32,7 @@ function M.sessions()
   end
 
   -- Find opencode processes and match with ports
-  local ret = {} ---@type sidekick.cli.session.State[]
+  local ret = {} ---@type ajans.cli.session.State[]
 
   for pid, port in pairs(ports) do
     local proc = vim.api.nvim_get_proc(pid)
@@ -59,14 +59,14 @@ function M:is_running()
 end
 
 function M:send(text)
-  require("sidekick.util").curl(self.base_url .. "/tui/append-prompt", {
+  require("ajans.util").curl(self.base_url .. "/tui/append-prompt", {
     method = "POST",
     data = { text = text },
   })
 end
 
 function M:submit()
-  require("sidekick.util").curl(self.base_url .. "/tui/submit-prompt", {
+  require("ajans.util").curl(self.base_url .. "/tui/submit-prompt", {
     method = "POST",
     data = {},
   })
@@ -74,10 +74,10 @@ end
 
 -- only register on Unix-like systems with lsof available
 if vim.fn.has("win32") == 0 and vim.fn.executable("lsof") == 1 then
-  require("sidekick.cli.session").register("opencode", M)
+  require("ajans.cli.session").register("opencode", M)
 end
 
----@type sidekick.cli.Config
+---@type ajans.cli.Config
 return {
   cmd = { "opencode" },
   env = {

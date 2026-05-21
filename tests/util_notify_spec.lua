@@ -1,6 +1,6 @@
 ---@module 'luassert'
 
-local Util = require("sidekick.util")
+local Util = require("ajans.util")
 
 describe("util notify", function()
   it("routes to vim.notify with title", function()
@@ -22,8 +22,8 @@ describe("util notify", function()
     vim.notify = original_notify
 
     assert.are.same({
-      { msg = "oops", level = vim.log.levels.ERROR, opts = { title = "Sidekick" } },
-      { msg = "hello", level = vim.log.levels.INFO, opts = { title = "Sidekick" } },
+      { msg = "oops", level = vim.log.levels.ERROR, opts = { title = "Ajans" } },
+      { msg = "hello", level = vim.log.levels.INFO, opts = { title = "Ajans" } },
     }, called)
   end)
 end)

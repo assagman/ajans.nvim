@@ -1,4 +1,4 @@
----@type sidekick.cli.Config
+---@type ajans.cli.Config
 return {
   cmd = { "codex" },
   is_proc = "\\<codex\\>",

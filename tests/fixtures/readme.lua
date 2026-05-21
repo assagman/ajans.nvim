@@ -1,5 +1,5 @@
 local base = {
-  "folke/sidekick.nvim",
+  "assagman/ajans.nvim",
   opts = {
     -- add any options here
     cli = {
@@ -15,7 +15,7 @@ local base = {
       "<tab>",
       function()
         -- if there is a next edit, jump to it, otherwise apply it if any
-        if not require("sidekick").nes_jump_or_apply() then
+        if not require("ajans").nes_jump_or_apply() then
           return "<Tab>" -- fallback to normal tab
         end
       end,
@@ -24,61 +24,61 @@ local base = {
     },
     {
       "<c-.>",
-      function() require("sidekick.cli").focus() end,
-      desc = "Sidekick Focus",
+      function() require("ajans.cli").focus() end,
+      desc = "Ajans Focus",
       mode = { "n", "t", "i", "x" },
     },
     {
       "<leader>aa",
-      function() require("sidekick.cli").toggle() end,
-      desc = "Sidekick Toggle CLI",
+      function() require("ajans.cli").toggle() end,
+      desc = "Ajans Toggle CLI",
     },
     {
       "<leader>as",
-      function() require("sidekick.cli").select() end,
+      function() require("ajans.cli").select() end,
       -- Or to select only installed tools:
-      -- require("sidekick.cli").select({ filter = { installed = true } })
+      -- require("ajans.cli").select({ filter = { installed = true } })
       desc = "Select CLI",
     },
     {
       "<leader>ad",
-      function() require("sidekick.cli").close() end,
+      function() require("ajans.cli").close() end,
       desc = "Detach a CLI Session",
     },
     {
       "<leader>at",
-      function() require("sidekick.cli").send({ msg = "{this}" }) end,
+      function() require("ajans.cli").send({ msg = "{this}" }) end,
       mode = { "x", "n" },
       desc = "Send This",
     },
     {
       "<leader>af",
-      function() require("sidekick.cli").send({ msg = "{file}" }) end,
+      function() require("ajans.cli").send({ msg = "{file}" }) end,
       desc = "Send File",
     },
     {
       "<leader>av",
-      function() require("sidekick.cli").send({ msg = "{selection}" }) end,
+      function() require("ajans.cli").send({ msg = "{selection}" }) end,
       mode = { "x" },
       desc = "Send Visual Selection",
     },
     {
       "<leader>ap",
-      function() require("sidekick.cli").prompt() end,
+      function() require("ajans.cli").prompt() end,
       mode = { "n", "x" },
-      desc = "Sidekick Select Prompt",
+      desc = "Ajans Select Prompt",
     },
     -- Example of a keybinding to open Claude directly
     {
       "<leader>ac",
-      function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end,
-      desc = "Sidekick Toggle Claude",
+      function() require("ajans.cli").toggle({ name = "claude", focus = true }) end,
+      desc = "Ajans Toggle Claude",
     },
   },
 }
 
 local custom = {
-  "folke/sidekick.nvim",
+  "assagman/ajans.nvim",
   opts = {
     -- add any options here
   },
@@ -87,7 +87,7 @@ local custom = {
       "<tab>",
       function()
         -- if there is a next edit, jump to it, otherwise apply it if any
-        if require("sidekick").nes_jump_or_apply() then
+        if require("ajans").nes_jump_or_apply() then
           return -- jumped or applied
         end
 
@@ -117,8 +117,8 @@ local blink = {
     keymap = {
       ["<Tab>"] = {
         "snippet_forward",
-        function() -- sidekick next edit suggestion
-          return require("sidekick").nes_jump_or_apply()
+        function() -- ajans next edit suggestion
+          return require("ajans").nes_jump_or_apply()
         end,
         function() -- if you are using Neovim's native inline completions
           return vim.lsp.inline_completion.get()
@@ -141,13 +141,13 @@ local lualine = {
         return " "
       end,
       color = function()
-        local status = require("sidekick.status").get()
+        local status = require("ajans.status").get()
         if status then
           return status.kind == "Error" and "DiagnosticError" or status.busy and "DiagnosticWarn" or "Special"
         end
       end,
       cond = function()
-        local status = require("sidekick.status")
+        local status = require("ajans.status")
         return status.get() ~= nil
       end,
     })
@@ -155,11 +155,11 @@ local lualine = {
     -- CLI session status
     table.insert(opts.sections.lualine_x, 2, {
       function()
-        local status = require("sidekick.status").cli()
+        local status = require("ajans.status").cli()
         return " " .. (#status > 1 and #status or "")
       end,
       cond = function()
-        return #require("sidekick.status").cli() > 0
+        return #require("ajans.status").cli() > 0
       end,
       color = function()
         return "Special"
@@ -174,15 +174,15 @@ local snacks_picker = {
   opts = {
     picker = {
       actions = {
-        sidekick_send = function(...)
-          return require("sidekick.cli.picker.snacks").send(...)
+        ajans_send = function(...)
+          return require("ajans.cli.picker.snacks").send(...)
         end,
       },
       win = {
         input = {
           keys = {
             ["<a-a>"] = {
-              "sidekick_send",
+              "ajans_send",
               mode = { "n", "i" },
             },
           },

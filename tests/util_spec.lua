@@ -1,6 +1,6 @@
 ---@module 'luassert'
 
-local Util = require("sidekick.util")
+local Util = require("ajans.util")
 
 describe("split_words", function()
   -- should split a string in alpha / non-alpha parts
@@ -28,7 +28,7 @@ describe("split_words", function()
     { "foo😀bar", { "foo", "😀", "bar" } },
     { "ありがとう", { "あ", "り", "が", "と", "う" } },
     {
-      'local diff = require("sidekick.nes.diff").diff(edit)',
+      'local diff = require("ajans.nes.diff").diff(edit)',
       {
         "local",
         " ",
@@ -39,7 +39,7 @@ describe("split_words", function()
         "require",
         "(",
         '"',
-        "sidekick",
+        "ajans",
         ".",
         "nes",
         ".",
