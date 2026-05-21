@@ -9,7 +9,7 @@ if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
   if [[ $status -ne 0 ]]; then
     while IFS= read -r line; do
       printf '::error::%s\n' "$line"
-    done < <(tail -200 "$log")
+    done < <(tail -80 "$log" | tac)
   fi
   exit "$status"
 fi
