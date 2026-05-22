@@ -57,14 +57,11 @@ local defaults = {
       nav = nil,
     },
     ---@class ajans.cli.Mux
-    ---@field backend? "tmux"|"zellij" Multiplexer backend to persist CLI sessions
     mux = {
-      backend = vim.env.ZELLIJ and "zellij" or "tmux", -- default to tmux unless zellij is detected
       enabled = false,
       -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
-      -- window: when run inside a terminal multiplexer, new sessions will be created in a new tab
-      -- split: when run inside a terminal multiplexer, new sessions will be created in a new split
-      -- NOTE: zellij only supports `terminal`
+      -- window: when run inside tmux, new sessions will be created in a new window
+      -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
       split = {
         vertical = true, -- vertical or horizontal split
@@ -152,8 +149,11 @@ function M.setup(opts)
   local user = {} ---@type ajans.Config
   for key in pairs(defaults) do
     if opts and opts[key] ~= nil then
-      user[key] = opts[key]
+      user[key] = vim.deepcopy(opts[key])
     end
+  end
+  if user.cli and user.cli.mux then
+    user.cli.mux["backend"] = nil
   end
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), user)
 
@@ -189,7 +189,6 @@ function M.setup(opts)
     require("ajans.status").setup()
 
     M.validate("cli.win.layout", { "float", "left", "bottom", "top", "right" })
-    M.validate("cli.mux.backend", { "tmux", "zellij" })
     M.validate("cli.mux.create", { "terminal", "window", "split" })
   end)
 end

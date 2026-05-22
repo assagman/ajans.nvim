@@ -79,7 +79,7 @@ end
 function M.new(state)
   local tool = state.tool
   tool = type(tool) == "string" and Config.get_tool(tool) or tool --[[@as ajans.cli.Tool]]
-  local backend = state.backend or (Config.cli.mux.enabled and Config.cli.mux.backend or "terminal")
+  local backend = state.backend or (Config.cli.mux.enabled and "tmux" or "terminal")
   local super = assert(M.backends[backend], "unknown backend: " .. backend)
   local meta = getmetatable(state)
   local self = setmetatable(state, super) --[[@as ajans.cli.Session]]
@@ -121,7 +121,7 @@ function M.setup()
   end
   M.did_setup = true
   Config.tools() -- load tools, since they may register session backends
-  local session_backends = { tmux = "ajans.cli.session.tmux", zellij = "ajans.cli.session.zellij" }
+  local session_backends = { tmux = "ajans.cli.session.tmux" }
   for name, mod in pairs(session_backends) do
     if vim.fn.executable(name) == 1 then
       M.register(name, require(mod))

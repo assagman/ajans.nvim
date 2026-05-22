@@ -13,7 +13,7 @@ and keep sessions alive inside your normal Neovim workflow.
   - 📦 **Pre-configured for Popular Tools**: Out-of-the-box support for Claude, Gemini, Grok, Codex, Copilot CLI, and more.
   - ✨ **Context-Aware Prompts**: Automatically include file content, cursor position, and diagnostics in your prompts.
   - 📝 **Prompt Library**: A library of pre-defined prompts for common tasks like explaining code, fixing issues, or writing tests.
-  - 🔄 **Session Persistence**: Keep your CLI sessions alive with `tmux` and `zellij` integration.
+  - 🔄 **Session Persistence**: Keep your CLI sessions alive with `tmux` integration.
   - 📂 **Automatic File Watching**: Automatically reloads files in Neovim when they are modified by AI tools.
 
 - **🔌 Extensible and Customizable**
@@ -26,6 +26,7 @@ and keep sessions alive inside your normal Neovim workflow.
 - **Neovim** `>= 0.11.2` or newer
 - [snacks.nvim](https://github.com/folke/snacks.nvim) for better prompt/tool selection **_(optional)_**
 - [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) **_(`main` branch)_** for `{function}` and `{class}` context variables **_(optional)_**
+- [tmux](https://github.com/tmux/tmux/wiki) for persistent CLI sessions
 - AI cli tools, such as Codex, Claude, Copilot, Gemini, … **_(optional)_**
   see the [🤖 AI CLI Integration](#-ai-cli-integration) section for details.
 - [lsof](https://man7.org/linux/man-pages/man8/lsof.8.html) and [ps](https://man7.org/linux/man-pages/man1/ps.1.html) are used
@@ -54,7 +55,6 @@ Install with your favorite manager. With [lazy.nvim](https://github.com/folke/la
     -- add any options here
     cli = {
       mux = {
-        backend = "zellij",
         enabled = true,
       },
     },
@@ -187,14 +187,11 @@ local defaults = {
       nav = nil,
     },
     ---@class ajans.cli.Mux
-    ---@field backend? "tmux"|"zellij" Multiplexer backend to persist CLI sessions
     mux = {
-      backend = vim.env.ZELLIJ and "zellij" or "tmux", -- default to tmux unless zellij is detected
       enabled = false,
       -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
-      -- window: when run inside a terminal multiplexer, new sessions will be created in a new tab
-      -- split: when run inside a terminal multiplexer, new sessions will be created in a new split
-      -- NOTE: zellij only supports `terminal`
+      -- window: when run inside tmux, new sessions will be created in a new window
+      -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
       split = {
         vertical = true, -- vertical or horizontal split
@@ -653,14 +650,13 @@ in your statusline.
 
 ### Terminal sessions not persisting?
 
-Make sure you have tmux or zellij installed and enable the multiplexer:
+Make sure you have tmux installed and enable the multiplexer:
 
 ```lua
 opts = {
   cli = {
     mux = {
       enabled = true,
-      backend = "tmux", -- or "zellij"
     },
   },
 }

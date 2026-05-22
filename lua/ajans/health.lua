@@ -30,14 +30,10 @@ function M.check()
     ok("Terminal multiplexer integration is disabled")
   end
 
-  for _, mux in ipairs({ "tmux", "zellij" }) do
-    if vim.fn.executable(mux) == 1 then
-      ok("`" .. mux .. "` is installed")
-    elseif mux == Config.cli.mux.backend then
-      error("Multiplexer backend `" .. mux .. "` is not installed")
-    else
-      ok("`" .. mux .. "` is not installed, but it's not the configured backend")
-    end
+  if vim.fn.executable("tmux") == 1 then
+    ok("`tmux` is installed")
+  else
+    error("`tmux` is not installed")
   end
 
   if vim.fn.has("win32") == 0 then

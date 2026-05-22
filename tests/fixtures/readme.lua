@@ -4,7 +4,6 @@ local base = {
     -- add any options here
     cli = {
       mux = {
-        backend = "zellij",
         enabled = true,
       },
     },

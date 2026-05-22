@@ -29,7 +29,7 @@ FEATURES                                *ajans.nvim-ajans.nvim-features*
   diagnostics, quickfix entries, functions, and classes.
 - Prompt library for common tasks such as explaining code, fixing issues,
   reviews, tests, and documentation.
-- Session persistence with tmux and zellij.
+- Session persistence with tmux.
 - Automatic file watching for changes made by AI tools.
 - Picker actions and statusline helpers for plugin integration.
 
@@ -39,6 +39,7 @@ REQUIREMENTS                        *ajans.nvim-ajans.nvim-requirements*
 - snacks.nvim for better prompt/tool selection (optional)
 - nvim-treesitter-textobjects main branch for `{function}` and `{class}`
   context variables (optional)
+- tmux for persistent CLI sessions
 - AI CLI tools such as Codex, Claude, Copilot, Gemini, etc. (optional)
 - lsof and ps on Unix-like systems for running process and port detection
   (optional, but recommended)
@@ -61,7 +62,6 @@ Example lazy.nvim setup:
       opts = {
         cli = {
           mux = {
-            backend = "zellij",
             enabled = true,
           },
         },
@@ -93,7 +93,6 @@ Configure with:
         },
         mux = {
           enabled = false,
-          backend = "tmux",
           create = "terminal",
         },
         tools = {
@@ -193,14 +192,13 @@ CLI tools not starting? ~
 
 Terminal sessions not persisting? ~
 
-Install tmux or zellij and enable the multiplexer:
+Install tmux and enable the multiplexer:
 
 >lua
     opts = {
       cli = {
         mux = {
           enabled = true,
-          backend = "tmux", -- or "zellij"
         },
       },
     }
