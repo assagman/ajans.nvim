@@ -212,7 +212,7 @@ local defaults = {
       pi       = {},
       qwen     = {},
     },
-    --- Add custom context. See `lua/ajans/context/init.lua`
+    --- Add custom context. See `lua/ajans/cli/context/init.lua`
     ---@type table<string, ajans.context.Fn>
     context = {},
     ---@type table<string, ajans.Prompt|string|fun(ctx:ajans.context.ctx):(string?)>
@@ -499,6 +499,7 @@ Ajans preconfigures popular AI CLIs. Run `:checkhealth ajans` to see which ones 
 | [`gemini`](https://github.com/google-gemini/gemini-cli)     | Google Gemini CLI    | See [repo](https://github.com/google-gemini/gemini-cli)                                                                |
 | [`grok`](https://github.com/superagent-ai/grok-cli)         | xAI Grok CLI         | See [repo](https://github.com/superagent-ai/grok-cli)                                                                  |
 | [`opencode`](https://github.com/sst/opencode)               | OpenCode CLI         | `npm install -g opencode`                                                                                              |
+| [`pi`](https://github.com/badlogic/pi-mono)                 | Pi CLI agent         | See [repo](https://github.com/badlogic/pi-mono)                                                                        |
 | [`qwen`](https://github.com/QwenLM/qwen-code)               | Alibaba Qwen Code    | See [repo](https://github.com/QwenLM/qwen-code)                                                                        |
 
 > [!TIP]

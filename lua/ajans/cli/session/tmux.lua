@@ -58,7 +58,7 @@ end
 function M:spawn(cmd)
   local pane = M.panes({ cmd = cmd, notify = true })[1]
   if pane then
-    self.id = pane.skid
+    self.id = pane.state_id
     self.tmux_pane_id = pane.id
     self.mux_session = pane.session_name
     self.tmux_pid = pane.pid
@@ -95,7 +95,7 @@ function M.panes(opts)
       pid = assert(tonumber(pid), "invalid tmux pane_pid: " .. pid) --[[@as number]]
       ---@class ajans.tmux.Pane
       panes[#panes + 1] = {
-        skid = ("tmux %s"):format(pid), -- unique id for the pane
+        state_id = ("tmux %s"):format(pid), -- unique id for the pane state
         pid = pid, -- process id of the pane
         id = id, -- tmux pane id
         session_name = session_name,
@@ -137,7 +137,7 @@ function M.sessions()
           local pids = Procs.pids(pane.pid)
           vim.list_extend(pids, clients[pane.session_id] or {})
           ret[#ret + 1] = {
-            id = pane.skid,
+            id = pane.state_id,
             cwd = proc.cwd or pane.cwd,
             tool = tool,
             tmux_pane_id = pane.id,

@@ -22,12 +22,20 @@ describe("config", function()
     assert.is_nil(Config.extra)
   end)
 
-  it("does not expose legacy mux toggles as config options", function()
+  it("exposes only supported mux options", function()
     local opts = {
       cli = {
         mux = {
           enabled = false,
           backend = "screen",
+          ignored = true,
+          create = "split",
+          split = {
+            vertical = false,
+            size = 20,
+            extra = true,
+          },
+          dump = 100,
         },
       },
     }
@@ -36,7 +44,15 @@ describe("config", function()
 
     assert.is_nil(Config.cli.mux["enabled"])
     assert.is_nil(Config.cli.mux["backend"])
+    assert.is_nil(Config.cli.mux["ignored"])
+    assert.is_nil(Config.cli.mux.split["extra"])
+    assert.are.equal("split", Config.cli.mux.create)
+    assert.are.equal(false, Config.cli.mux.split.vertical)
+    assert.are.equal(20, Config.cli.mux.split.size)
+    assert.are.equal(100, Config.cli.mux.dump)
     assert.is_false(opts.cli.mux["enabled"])
     assert.are.equal("screen", opts.cli.mux["backend"])
+    assert.is_true(opts.cli.mux["ignored"])
+    assert.is_true(opts.cli.mux.split["extra"])
   end)
 end)
