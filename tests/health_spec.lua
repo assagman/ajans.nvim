@@ -26,20 +26,23 @@ describe("health", function()
     pcall(vim.api.nvim_del_user_command, "Ajans")
   end)
 
-  it("reports missing tmux even when user supplies another backend", function()
+  it("reports missing tmux even when user supplies legacy mux options", function()
     setup_config({
       cli = {
         mux = {
-          enabled = true,
+          enabled = false,
           backend = "screen",
         },
       },
     })
 
+    local oks = {}
     local errors = {}
     vim.health = {
       start = function() end,
-      ok = function() end,
+      ok = function(message)
+        oks[#oks + 1] = message
+      end,
       warn = function() end,
       error = function(message)
         errors[#errors + 1] = message
@@ -56,5 +59,6 @@ describe("health", function()
     require("ajans.health").check()
 
     assert.are.same({ "`tmux` is not installed" }, errors)
+    assert.is_false(vim.tbl_contains(oks, "Terminal multiplexer integration is disabled"))
   end)
 end)

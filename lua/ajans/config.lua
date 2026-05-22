@@ -58,8 +58,7 @@ local defaults = {
     },
     ---@class ajans.cli.Mux
     mux = {
-      enabled = false,
-      -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
+      -- terminal: tmux sessions will be attached inside a Neovim terminal
       -- window: when run inside tmux, new sessions will be created in a new window
       -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
@@ -153,6 +152,7 @@ function M.setup(opts)
     end
   end
   if user.cli and user.cli.mux then
+    user.cli.mux["enabled"] = nil
     user.cli.mux["backend"] = nil
   end
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), user)

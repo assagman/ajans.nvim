@@ -97,8 +97,16 @@ end
 
 ---@param opts ajans.cli.session.Opts
 function M.new(opts)
-  opts.backend = "terminal"
-  return Session.new(opts) --[[@as ajans.cli.Terminal]]
+  local tool = opts.tool
+  tool = type(tool) == "string" and Config.get_tool(tool) or tool --[[@as ajans.cli.Tool]]
+  local self = setmetatable(opts, M) --[[@as ajans.cli.Terminal]]
+  self.tool = tool
+  self.cwd = Session.cwd(opts)
+  self.backend = "terminal"
+  self.sid = Session.sid({ tool = tool.name, cwd = self.cwd })
+  self.id = self.id or self.sid
+  self:init()
+  return self
 end
 
 function M:init()

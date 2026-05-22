@@ -53,11 +53,6 @@ Install with your favorite manager. With [lazy.nvim](https://github.com/folke/la
   "assagman/ajans.nvim",
   opts = {
     -- add any options here
-    cli = {
-      mux = {
-        enabled = true,
-      },
-    },
   },
   keys = {
     {
@@ -188,8 +183,7 @@ local defaults = {
     },
     ---@class ajans.cli.Mux
     mux = {
-      enabled = false,
-      -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
+      -- terminal: tmux sessions will be attached inside a Neovim terminal
       -- window: when run inside tmux, new sessions will be created in a new window
       -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
@@ -267,10 +261,10 @@ local defaults = {
 
 ## 🤖 AI CLI Integration
 
-Ajans ships with a lightweight terminal wrapper so you can talk to local AI CLI
-tools without leaving Neovim. Each tool runs in its own scratch terminal window and
-shares helper prompts that bundle buffer context, the current cursor position, and
-diagnostics when requested.
+Ajans runs local AI CLI tools through tmux so sessions persist across Neovim
+windows and restarts. When needed, Ajans opens a lightweight Neovim terminal
+wrapper that attaches to the tmux session while helper prompts bundle buffer
+context, the current cursor position, and diagnostics.
 
 <!-- api_cli:start -->
 
@@ -650,17 +644,7 @@ in your statusline.
 
 ### Terminal sessions not persisting?
 
-Make sure you have tmux installed and enable the multiplexer:
-
-```lua
-opts = {
-  cli = {
-    mux = {
-      enabled = true,
-    },
-  },
-}
-```
+Make sure you have tmux installed. Ajans always runs CLI sessions through tmux.
 
 ### Do I need a GitHub Copilot subscription?
 

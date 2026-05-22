@@ -22,11 +22,11 @@ describe("config", function()
     assert.is_nil(Config.extra)
   end)
 
-  it("does not expose mux backend as a config option", function()
+  it("does not expose legacy mux toggles as config options", function()
     local opts = {
       cli = {
         mux = {
-          enabled = true,
+          enabled = false,
           backend = "screen",
         },
       },
@@ -34,8 +34,9 @@ describe("config", function()
 
     setup_config(opts)
 
-    assert.is_true(Config.cli.mux.enabled)
+    assert.is_nil(Config.cli.mux["enabled"])
     assert.is_nil(Config.cli.mux["backend"])
+    assert.is_false(opts.cli.mux["enabled"])
     assert.are.equal("screen", opts.cli.mux["backend"])
   end)
 end)

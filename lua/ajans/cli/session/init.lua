@@ -12,7 +12,6 @@ M._attached = {} ---@type table<string,ajans.cli.Session>
 ---@field cwd string
 ---@field tool ajans.cli.Tool|string
 ---@field pids? integer[] list of pids associated with this session
----@field backend? string
 ---@field started? boolean
 ---@field external? boolean external sessions won't be opened in a terminal
 ---@field parent? ajans.cli.Session
@@ -79,7 +78,7 @@ end
 function M.new(state)
   local tool = state.tool
   tool = type(tool) == "string" and Config.get_tool(tool) or tool --[[@as ajans.cli.Tool]]
-  local backend = state.backend or (Config.cli.mux.enabled and "tmux" or "terminal")
+  local backend = "tmux"
   local super = assert(M.backends[backend], "unknown backend: " .. backend)
   local meta = getmetatable(state)
   local self = setmetatable(state, super) --[[@as ajans.cli.Session]]
@@ -110,6 +109,9 @@ end
 ---@param name string
 ---@param backend ajans.cli.Session
 function M.register(name, backend)
+  if name ~= "tmux" then
+    return
+  end
   setmetatable(backend, B)
   backend.backend = name
   M.backends[name] = backend
@@ -120,14 +122,8 @@ function M.setup()
     return
   end
   M.did_setup = true
-  Config.tools() -- load tools, since they may register session backends
-  local session_backends = { tmux = "ajans.cli.session.tmux" }
-  for name, mod in pairs(session_backends) do
-    if vim.fn.executable(name) == 1 then
-      M.register(name, require(mod))
-    end
-  end
-  M.register("terminal", require("ajans.cli.terminal"))
+  Config.tools() -- load tool configs
+  M.register("tmux", require("ajans.cli.session.tmux"))
 end
 
 function M.sessions()
@@ -144,6 +140,13 @@ function M.sessions()
       if M._attached[s.id] then
         M._attached[s.id] = ret[#ret] -- update to latest session instance
       end
+    end
+  end
+  for id, session in pairs(M._attached) do
+    if session.backend == "terminal" and session.mux_backend == "tmux" and session:is_running() then
+      ret[#ret + 1] = session
+      assert(not ids[id], "duplicate session id: " .. id)
+      ids[id] = true
     end
   end
   for id in pairs(M._attached) do
@@ -179,11 +182,10 @@ function M.attach(session)
     cmd = session:start()
   end
   if cmd then
-    session = M.new({
+    session = require("ajans.cli.terminal").new({
       tool = session.tool:clone({ cmd = cmd.cmd, env = cmd.env }),
       cwd = session.cwd,
       id = "terminal: " .. session.sid,
-      backend = "terminal",
       mux_backend = session.backend,
       mux_session = session.mux_session,
       parent = session,

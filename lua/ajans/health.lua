@@ -1,5 +1,3 @@
-local Config = require("ajans.config")
-
 local M = {}
 
 local start = vim.health.start or vim.health.report_start
@@ -24,11 +22,7 @@ function M.check()
     warn("autoread is disabled, file changes from AI CLI tools will not be detected automatically")
   end
 
-  if Config.cli.mux.enabled then
-    ok("Terminal multiplexer integration is enabled")
-  else
-    ok("Terminal multiplexer integration is disabled")
-  end
+  ok("Terminal multiplexer integration uses `tmux`")
 
   if vim.fn.executable("tmux") == 1 then
     ok("`tmux` is installed")
