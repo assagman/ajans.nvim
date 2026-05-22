@@ -86,7 +86,7 @@ describe("commands", function()
       {
         name = "completes root commands",
         input = "",
-        expected_completions = { "cli", "nes" },
+        expected_completions = { "cli" },
       },
       {
         name = "completes subcommands",
@@ -136,7 +136,7 @@ describe("commands", function()
       {
         name = "strips command prefix",
         input = "Ajans ",
-        expected = { "cli", "nes" },
+        expected = { "cli" },
       },
       {
         name = "suggests subcommands",

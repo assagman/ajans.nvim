@@ -5,31 +5,6 @@ M.ns = vim.api.nvim_create_namespace("ajans.ui")
 
 ---@class ajans.Config
 local defaults = {
-  nes = {
-    ---@type boolean|fun(buf:integer):boolean?
-    enabled = function(buf)
-      return vim.g.ajans_nes ~= false and vim.b.ajans_nes ~= false
-    end,
-    debounce = 100,
-    trigger = {
-      -- events that trigger ajans next edit suggestions
-      events = { "ModeChanged i:n", "TextChanged", "User AjansNesDone" },
-    },
-    clear = {
-      -- events that clear the current next edit suggestion
-      events = { "TextChangedI", "InsertEnter" },
-      esc = true, -- clear next edit suggestions when pressing <Esc>
-    },
-    ---@class ajans.diff.Opts
-    ---@field inline? "words"|"chars"|false Enable inline diffs
-    ---@field show? "always"|"cursor" `cursor` will only show the diff when the cursor is at the edit position.
-    diff = {
-      inline = "words",
-      show = "always",
-    },
-    signs = true, -- show signs for next edit suggestions
-    jumplist = true, -- add an entry to the jumplist
-  },
   -- Work with AI cli tools directly from within Neovim
   cli = {
     watch = true, -- notify Neovim of file changes done by AI CLI tools
@@ -146,19 +121,9 @@ local defaults = {
     ---@alias ajans.picker "snacks"|"telescope"|"fzf-lua"
     picker = "snacks", ---@type ajans.picker
   },
-  copilot = {
-    -- track copilot's status with `didChangeStatus`
-    status = {
-      enabled = true,
-      level = vim.log.levels.WARN,
-      -- set to vim.log.levels.OFF to disable notifications
-      -- level = vim.log.levels.OFF,
-    },
-  },
   ui = {
     -- stylua: ignore
     icons = {
-      nes               = " ",
       attached          = " ",
       started           = " ",
       installed         = " ",
@@ -184,7 +149,13 @@ end
 
 ---@param opts? ajans.Config
 function M.setup(opts)
-  config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
+  local user = {} ---@type ajans.Config
+  for key in pairs(defaults) do
+    if opts and opts[key] ~= nil then
+      user[key] = opts[key]
+    end
+  end
+  config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), user)
 
   vim.api.nvim_create_user_command("Ajans", function(args)
     require("ajans.commands").cmd(args)
@@ -215,16 +186,11 @@ function M.setup(opts)
       end,
     })
 
-    if M.nes.enabled ~= false then
-      require("ajans.nes").enable()
-    end
-
     require("ajans.status").setup()
 
     M.validate("cli.win.layout", { "float", "left", "bottom", "top", "right" })
     M.validate("cli.mux.backend", { "tmux", "zellij" })
     M.validate("cli.mux.create", { "terminal", "window", "split" })
-    M.validate("nes.diff.show", { "always", "cursor" })
   end)
 end
 
@@ -251,23 +217,6 @@ function M.validate(key, t)
   return true
 end
 
----@param client vim.lsp.Client|string
-function M.is_copilot(client)
-  local name = type(client) == "table" and client.name or client --[[@as string]]
-  return name and name:lower():find("copilot")
-end
-
----@param filter? vim.lsp.get_clients.Filter
----@return vim.lsp.Client[]
-function M.get_clients(filter)
-  return vim.tbl_filter(M.is_copilot, vim.lsp.get_clients(filter))
-end
-
----@param buf? number
-function M.get_client(buf)
-  return M.get_clients({ bufnr = buf or 0 })[1]
-end
-
 ---@param name string
 function M.get_tool(name)
   return require("ajans.cli.tool").get(name)
@@ -283,10 +232,6 @@ end
 
 function M.set_hl()
   local links = {
-    DiffContext = "DiffChange",
-    DiffAdd = "DiffText",
-    DiffDelete = "DiffDelete",
-    Sign = "Special",
     Chat = "NormalFloat",
     CliMissing = "DiagnosticError",
     CliAttached = "Special",

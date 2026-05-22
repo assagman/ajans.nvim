@@ -3,37 +3,46 @@ local M = {}
 function M.update()
   local Docs = require("lazy.docs")
   local config = Docs.extract("lua/ajans/config.lua", "\n(--@class ajans%.Config.-\n})")
-  config = config:gsub("%s*debug = false.\n", "\n")
+  config = config:gsub("%s*debug = false,.-\n", "\n")
 
   Docs.save({
     config = config,
     setup_base = Docs.extract("tests/fixtures/readme.lua", "local base = ({.-\n})"),
-    setup_custom = Docs.extract("tests/fixtures/readme.lua", "local custom = ({.-\n})"),
-    setup_blink = Docs.extract("tests/fixtures/readme.lua", "local blink = ({.-\n})"),
     setup_lualine = Docs.extract("tests/fixtures/readme.lua", "local lualine = ({.-\n})"),
     snacks_picker = Docs.extract("tests/fixtures/readme.lua", "local snacks_picker = ({.-\n})"),
     api_cli = { content = M.mod("cli") },
-    api_nes = { content = M.mod("nes") },
   })
 end
 
 ---@param mod string
 function M.mod(mod)
-  local Docs = require("snacks.meta.docs")
   local commands = vim.tbl_keys(require("ajans.commands").commands[mod]) ---@type string[]
   table.sort(commands)
-  local fname = "lua/ajans/" .. mod .. "/init.lua"
-  local info = Docs.extract(vim.fn.readfile(fname), { prefix = "Snacks.examples", name = "cli" })
+
   local lines = {} ---@type string[]
-  local methods = {} ---@type table<string,snacks.docs.Method>
+  local methods = {} ---@type table<string,{name:string,args:string,comment:string}>
+  local comment = {} ---@type string[]
+
+  for _, line in ipairs(vim.fn.readfile("lua/ajans/" .. mod .. "/init.lua")) do
+    if line:find("^%-%-") then
+      comment[#comment + 1] = line
+    else
+      local name, args = line:match("^function M%.([%w_]+)%((.*)%)")
+      if name and not table.concat(comment, "\n"):find("@deprecated", 1, true) then
+        methods[name] = {
+          name = name,
+          args = args,
+          comment = table.concat(comment, "\n"),
+        }
+      end
+      if line:match("%S") then
+        comment = {}
+      end
+    end
+  end
 
   lines[#lines + 1] = "<table><tr><th>Cmd</th><th>Lua</th></tr>"
 
-  for _, m in ipairs(info.methods) do
-    if not (m.comment and m.comment:find("@private")) then
-      methods[m.name] = m
-    end
-  end
   local names = vim.deepcopy(commands)
   for n in pairs(methods) do
     if not vim.tbl_contains(names, n) then

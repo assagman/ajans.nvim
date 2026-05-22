@@ -1,19 +1,12 @@
 # 🤖 `ajans.nvim`
 
-**ajans.nvim** is your Neovim AI ajans that integrates Copilot LSP's
-"Next Edit Suggestions" with a built-in terminal for any AI CLI.
-Review and apply diffs, chat with AI assistants, and streamline your coding,
-without leaving your editor.
+**ajans.nvim** is your Neovim AI ajans for working with AI CLI tools
+without leaving your editor. Chat with assistants, send rich buffer context,
+and keep sessions alive inside your normal Neovim workflow.
 
 <img width="2311" height="1396" alt="image" src="https://github.com/user-attachments/assets/63a33610-9a8e-45e2-bbd0-b7e3a4fde621" />
 
 ## ✨ Features
-
-- **🤖 Next Edit Suggestions (NES) powered by Copilot LSP**
-  - 🪄 **Automatic Suggestions**: Fetches suggestions automatically when you pause typing or move the cursor.
-  - 🎨 **Rich Diffs**: Visualizes changes with inline and block-level diffs, featuring Treesitter-based syntax highlighting with granular diffing down to the word or character level.
-  - 🧭 **Hunk-by-Hunk Navigation**: Jump through edits to review them one by one before applying.
-  - 📊 **Statusline Integration**: Shows Copilot LSP's status, request progress, and preview text in your statusline.
 
 - **💬 Integrated AI CLI Terminal**
   - 🚀 **Direct Access to AI CLIs**: Interact with your favorite AI command-line tools without leaving Neovim.
@@ -26,19 +19,11 @@ without leaving your editor.
 - **🔌 Extensible and Customizable**
   - ⚙️ **Flexible Configuration**: Fine-tune every aspect of the plugin to your liking.
   - 🧩 **Plugin-Friendly API**: A rich API for integrating with other plugins and building custom workflows.
-  - 🎨 **Customizable UI**: Change the appearance of diffs, signs, and more.
+  - 🎨 **Customizable UI**: Change terminal layout, keymaps, picker actions, and statusline output.
 
 ## 📋 Requirements
 
 - **Neovim** `>= 0.11.2` or newer
-- The official [copilot-language-server](https://github.com/github/copilot-language-server-release) LSP server,
-  enabled with `vim.lsp.enable`. Can be installed in multiple ways:
-  1. install using `npm` or your OS's package manager
-  2. install with [mason-lspconfig.nvim](https://github.com/mason-org/mason-lspconfig.nvim)
-  3. [copilot.lua](https://github.com/zbirenbaum/copilot.lua) and [copilot.vim](https://github.com/github/copilot.vim)
-     both bundle the LSP Server in their plugin.
-- A working `lsp/copilot.lua` configuration.
-  - **TIP:** Included in [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
 - [snacks.nvim](https://github.com/folke/snacks.nvim) for better prompt/tool selection **_(optional)_**
 - [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) **_(`main` branch)_** for `{function}` and `{class}` context variables **_(optional)_**
 - AI cli tools, such as Codex, Claude, Copilot, Gemini, … **_(optional)_**
@@ -49,16 +34,12 @@ without leaving your editor.
 ## 🚀 Quick Start
 
 1. **Install** the plugin with your package manager (see below)
-2. **Configure Copilot LSP** - must be enabled with `vim.lsp.enable`
-3. **Check health**: `:checkhealth ajans`
-4. **Sign in to Copilot**: `:LspCopilotSignIn`
-5. **Try it out**:
-   - Type some code and pause - watch for Next Edit Suggestions appearing
-   - Press `<Tab>` to navigate through or apply suggestions
-   - Use `<leader>aa` to open AI CLI tools
-
-> [!NOTE]
-> **New to Next Edit Suggestions?** Unlike inline completions, NES suggests entire refactorings or multi-line changes anywhere in your file - think of it as Copilot's "big picture" suggestions.
+2. **Check health**: `:checkhealth ajans`
+3. **Install at least one AI CLI tool** such as Claude, Codex, Gemini, or Copilot CLI
+4. **Try it out**:
+   - Use `<leader>aa` to open your current AI CLI session
+   - Use `<leader>as` to select a specific tool
+   - Use `<leader>at`, `<leader>af`, or `<leader>av` to send context
 
 ## 📦 Installation
 
@@ -79,17 +60,6 @@ Install with your favorite manager. With [lazy.nvim](https://github.com/folke/la
     },
   },
   keys = {
-    {
-      "<tab>",
-      function()
-        -- if there is a next edit, jump to it, otherwise apply it if any
-        if not require("ajans").nes_jump_or_apply() then
-          return "<Tab>" -- fallback to normal tab
-        end
-      end,
-      expr = true,
-      desc = "Goto/Apply Next Edit Suggestion",
-    },
     {
       "<c-.>",
       function() require("ajans.cli").focus() end,
@@ -151,81 +121,7 @@ Install with your favorite manager. With [lazy.nvim](https://github.com/folke/la
 > [!TIP]
 > It's a good idea to run `:checkhealth ajans` after install.
 
-<details>
-  <summary>Integrate <code>&lt;Tab&gt;</code> in insert mode with <a href="https://github.com/saghen/blink.cmp">blink.cmp</a></summary>
 
-<!-- setup_blink:start -->
-
-```lua
-{
-  "saghen/blink.cmp",
-  ---@module 'blink.cmp'
-  ---@type blink.cmp.Config
-  opts = {
-
-    keymap = {
-      ["<Tab>"] = {
-        "snippet_forward",
-        function() -- ajans next edit suggestion
-          return require("ajans").nes_jump_or_apply()
-        end,
-        function() -- if you are using Neovim's native inline completions
-          return vim.lsp.inline_completion.get()
-        end,
-        "fallback",
-      },
-    },
-  },
-}
-```
-
-<!-- setup_blink:end -->
-
-</details>
-
-<details>
-  <summary>Custom <code>&lt;Tab&gt;</code> integration for <b>insert mode</b></summary>
-
-<!-- setup_custom:start -->
-
-```lua
-{
-  "assagman/ajans.nvim",
-  opts = {
-    -- add any options here
-  },
-  keys = {
-    {
-      "<tab>",
-      function()
-        -- if there is a next edit, jump to it, otherwise apply it if any
-        if require("ajans").nes_jump_or_apply() then
-          return -- jumped or applied
-        end
-
-        -- if you are using Neovim's native inline completions
-        if vim.lsp.inline_completion.get() then
-          return
-        end
-
-        -- any other things (like snippets) you want to do on <tab> go here.
-
-        -- fall back to normal tab
-        return "<tab>"
-      end,
-      mode = { "i", "n" },
-      expr = true,
-      desc = "Goto/Apply Next Edit Suggestion",
-    },
-  },
-}
-```
-
-<!-- setup_custom:end -->
-
-</details>
-
-After installation sign in with `:LspCopilotSignIn` if prompted.
 
 ## ⚙️ Configuration
 
@@ -240,31 +136,6 @@ The module ships with safe defaults and exposes everything through
 ```lua
 ---@class ajans.Config
 local defaults = {
-  nes = {
-    ---@type boolean|fun(buf:integer):boolean?
-    enabled = function(buf)
-      return vim.g.ajans_nes ~= false and vim.b.ajans_nes ~= false
-    end,
-    debounce = 100,
-    trigger = {
-      -- events that trigger ajans next edit suggestions
-      events = { "ModeChanged i:n", "TextChanged", "User AjansNesDone" },
-    },
-    clear = {
-      -- events that clear the current next edit suggestion
-      events = { "TextChangedI", "InsertEnter" },
-      esc = true, -- clear next edit suggestions when pressing <Esc>
-    },
-    ---@class ajans.diff.Opts
-    ---@field inline? "words"|"chars"|false Enable inline diffs
-    ---@field show? "always"|"cursor" `cursor` will only show the diff when the cursor is at the edit position.
-    diff = {
-      inline = "words",
-      show = "always",
-    },
-    signs = true, -- show signs for next edit suggestions
-    jumplist = true, -- add an entry to the jumplist
-  },
   -- Work with AI cli tools directly from within Neovim
   cli = {
     watch = true, -- notify Neovim of file changes done by AI CLI tools
@@ -378,18 +249,8 @@ local defaults = {
     ---@alias ajans.picker "snacks"|"telescope"|"fzf-lua"
     picker = "snacks", ---@type ajans.picker
   },
-  copilot = {
-    -- track copilot's status with `didChangeStatus`
-    status = {
-      enabled = true,
-      level = vim.log.levels.WARN,
-      -- set to vim.log.levels.OFF to disable notifications
-      -- level = vim.log.levels.OFF,
-    },
-  },
   ui = {
     icons = {
-      nes               = " ",
       attached          = " ",
       started           = " ",
       installed         = " ",
@@ -400,94 +261,12 @@ local defaults = {
       terminal_started  = " ",
     },
   },
-  debug = false, -- enable debug logging
 }
 ```
 
 <!-- config:end -->
 
 </details>
-
-## ✏️ Next Edit Suggestions (NES)
-
-Copilot NES requests run automatically when you leave insert mode,
-modify text in normal mode, or after applying an edit.
-
-<!-- api_nes:start -->
-
-<table><tr><th>Cmd</th><th>Lua</th></tr>
-<tr><td><code>:Ajans nes apply</code> Apply active text edits</td><td>
-
-
-```lua
----@return boolean applied
-require("ajans.nes").apply()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes clear</code> Clear all active edits</td><td>
-
-
-```lua
-require("ajans.nes").clear()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes disable</code> </td><td>
-
-
-```lua
-
-require("ajans.nes").disable()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes enable</code> </td><td>
-
-
-```lua
----@param enable? boolean
-require("ajans.nes").enable(enable)
-```
-
-</td></tr>
-<tr><td> Check if any edits are active in the current buffer</td><td>
-
-
-```lua
-require("ajans.nes").have()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes jump</code> Jump to the start of the active edit</td><td>
-
-
-```lua
----@return boolean jumped
-require("ajans.nes").jump()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes toggle</code> </td><td>
-
-
-```lua
-
-require("ajans.nes").toggle()
-```
-
-</td></tr>
-<tr><td><code>:Ajans nes update</code> Request new edits from the LSP server (if any)</td><td>
-
-
-```lua
-require("ajans.nes").update()
-```
-
-</td></tr>
-</table>
-
-<!-- api_nes:end -->
 
 ## 🤖 AI CLI Integration
 
@@ -605,13 +384,12 @@ current file, selection, diagnostics, and more.
 - **changes**: `Can you review my changes?`
 - **diagnostics**: `Can you help me fix the diagnostics in {file}?\n{diagnostics}`
 - **diagnostics_all**: `Can you help me fix these diagnostics?\n{diagnostics_all}`
-- **document**: `Add documentation to {position}`
+- **document**: `Add documentation to {function|line}`
 - **explain**: `Explain {this}`
 - **fix**: `Can you fix {this}?`
 - **optimize**: `How can {this} be optimized?`
 - **review**: `Can you review {file} for any issues or improvements?`
 - **tests**: `Can you write tests for {this}?`
-- **quickfix**: `{quickfix}` (current quickfix entries).
 
 </details>
 
@@ -737,9 +515,7 @@ Ajans preconfigures popular AI CLIs. Run `:checkhealth ajans` to see which ones 
 
 ## 🚀 Commands
 
-Ajans provides a `:Ajans` command that allows you to interact with the plugin
-from the command line. The command is a thin wrapper around the Lua API, so you
-can use it to do anything that the Lua API can do.
+Ajans provides a `:Ajans` command for CLI workflows from the command line. The command is a thin wrapper around the `require("ajans.cli")` API.
 
 ### Command Structure
 
@@ -749,7 +525,7 @@ The command structure is simple:
 :Ajans <module> <command> [args]
 ```
 
-- `<module>`: The name of the module you want to use (e.g., `nes`, `cli`).
+- `<module>`: The name of the module you want to use (currently `cli`).
 - `<command>`: The name of the command you want to execute.
 - `[args]`: Optional arguments for the command. The arguments are parsed as a Lua
   table.
@@ -771,14 +547,6 @@ require("ajans.cli").show({ name = "claude" })
 <strong>Available Commands</strong></summary>
 
 Here's a list of the available commands:
-
-**NES (`nes`)**
-
-- `enable`: Enable Next Edit Suggestions.
-- `disable`: Disable Next Edit Suggestions.
-- `toggle`: Toggle Next Edit Suggestions.
-- `update`: Trigger a new suggestion.
-- `clear`: Clear the current suggestion.
 
 **CLI (`cli`)**
 
@@ -838,8 +606,8 @@ Here are some examples of how to use the `:Ajans` command:
 
 ## 📟 Statusline Integration
 
-Using the `require("ajans.status")` API, you can easily integrate **Copilot LSP**
-and **CLI sessions** in your statusline.
+Using the `require("ajans.status")` API, you can integrate active **CLI sessions**
+in your statusline.
 
 <details>
 <summary>Example for <a href="https://github.com/nvim-lualine/lualine.nvim">lualine.nvim</a></summary>
@@ -851,24 +619,7 @@ and **CLI sessions** in your statusline.
   "nvim-lualine/lualine.nvim",
   opts = function(_, opts)
     opts.sections = opts.sections or {}
-    opts.sections.lualine_c = opts.sections.lualine_c or {}
-
-    -- Copilot status
-    table.insert(opts.sections.lualine_c, {
-      function()
-        return " "
-      end,
-      color = function()
-        local status = require("ajans.status").get()
-        if status then
-          return status.kind == "Error" and "DiagnosticError" or status.busy and "DiagnosticWarn" or "Special"
-        end
-      end,
-      cond = function()
-        local status = require("ajans.status")
-        return status.get() ~= nil
-      end,
-    })
+    opts.sections.lualine_x = opts.sections.lualine_x or {}
 
     -- CLI session status
     table.insert(opts.sections.lualine_x, 2, {
@@ -892,31 +643,6 @@ and **CLI sessions** in your statusline.
 </details>
 
 ## ❓ FAQ
-
-### Does ajans.nvim replace Copilot's inline suggestions?
-
-No! NES complements inline suggestions. They serve different purposes:
-
-- **Inline completions**: Quick, as-you-type suggestions (use copilot.lua or native `vim.lsp.inline_completion`)
-- **NES**: Larger refactorings and multi-line changes after you pause
-
-You'll want both for the best experience.
-
-### How is this different from copilot.lua or copilot.vim?
-
-`copilot.lua` and `copilot.vim` provide **inline completions** (suggestions as you type). `ajans.nvim` adds:
-
-- **Next Edit Suggestions (NES)**: Multi-line refactorings and context-aware edits across your file
-- **AI CLI Integration**: Built-in terminal for Claude, Gemini, and other AI tools
-
-Use them together for the complete experience!
-
-### NES not showing suggestions?
-
-1. Run `:checkhealth ajans` to verify your setup
-2. Check Copilot is signed in: `:LspCopilotSignIn`
-3. Verify the LSP is attached: `:lua vim.print(require("ajans.config").get_client())`
-4. Try manually triggering: `:Ajans nes update`
 
 ### CLI tools not starting?
 
@@ -942,21 +668,12 @@ opts = {
 
 ### Do I need a GitHub Copilot subscription?
 
-Yes, but only for the **NES feature** (Next Edit Suggestions). The **AI CLI integration** works independently with any CLI tool (Claude, Gemini, etc.) and doesn't require Copilot.
-
-### Can I use this without NES, just for CLI tools?
-
-Absolutely! Just disable NES:
-
-```lua
-opts = {
-  nes = { enabled = false },
-}
-```
+No. Ajans works with any supported AI CLI tool. You only need a Copilot
+subscription if you choose to use Copilot CLI itself.
 
 ### Will this work with Neovim 0.10?
 
-No, Neovim **>= 0.11.2** is required for the LSP features and API used by ajans.nvim.
+No, Neovim **>= 0.11.2** is required for the APIs used by ajans.nvim.
 
 ### How do I add my own AI tool?
 

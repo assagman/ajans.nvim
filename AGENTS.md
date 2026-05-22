@@ -1,10 +1,10 @@
 # Agent Cheat Sheet
 
-This repository contains `ajans.nvim`, a Neovim plugin that integrates GitHub Copilot "Next Edit Suggestions" (NES) into Neovim. The plugin relies on Copilot's LSP and ships with an automated test + docs workflow.
+This repository contains `ajans.nvim`, a Neovim plugin that provides an integrated terminal workflow for AI CLI tools.
 
 ## Project Overview
 
-- Core modules live under `lua/ajans/` (`config.lua`, `nes/`, `status.lua`, etc.).
+- Core modules live under `lua/ajans/` (`config.lua`, `cli/`, `status.lua`, etc.).
 - Tests are written with `mini.test` and live in `tests/`. Specs are table-driven whenever possible.
 - Docs are generated automatically via `./scripts/docs`, which extracts Lua annotations to update `README.md` sections.
 - Code style is Lua with `stylua` / `selene` configs already included.
@@ -18,11 +18,6 @@ This repository contains `ajans.nvim`, a Neovim plugin that integrates GitHub Co
 - Inspect Neovim help topics from the CLI:
 
   ```bash
-  # show all doc paths then grep for a topic
-  nvim --headless '+lua print(table.concat(vim.api.nvim_get_runtime_file("doc/*.txt", true), " "))' +qall \
-    | xargs rg "vim.text.diff" -C4
-
-  # jump straight to a help entry and print the next 50 lines
   nvim --headless \
     '+lua vim.cmd.help("nvim_buf_set_extmark"); print(table.concat(vim.api.nvim_buf_get_lines(0, vim.fn.line(".") - 1, vim.fn.line(".") + 50, false), "\n"))' +qa
   ```
@@ -31,29 +26,27 @@ This repository contains `ajans.nvim`, a Neovim plugin that integrates GitHub Co
 
 ## Adding Features
 
-- Respect the `Config.nes.enabled` callback so that users can disable NES globally (`vim.g.ajans_nes = false`) or per-buffer (`vim.b[buf].ajans_nes = false`).
 - Keep new configuration options documented in `lua/ajans/config.lua`; docs are generated from this file.
-- When touching the diffing logic (`lua/ajans/nes/diff.lua`), update or add table-driven tests in `tests/diff_spec.lua`.
-- If a change affects status reporting, extend `tests/status_spec.lua` so notifications stay covered.
+- If a change affects CLI session status reporting, extend `tests/status_spec.lua` so notifications stay covered.
+- If a change affects context collection, extend the corresponding spec in `tests/`.
 
 ## Writing Tests
 
 - Use `mini.test` assertions (`assert.are.same`, `assert.is_true`, etc.).
-- Prefer table-driven specs for combinatorial cases (`tests/diff_spec.lua`, `tests/nes_spec.lua` demonstrate the style).
+- Prefer table-driven specs for combinatorial cases.
 - Stub Neovim APIs carefully: reassign functions and restore them in `after_each` hooks. For upvalue-based helpers (e.g., health reporters), use `debug.setupvalue`.
 
 ## Things to Watch
 
 - The repo may run in headless CI where network calls are blocked; stubs or fixtures should avoid third-party fetches.
 - Avoid touching generated docs directly—run `./scripts/docs` instead.
-- Maintain ASCII unless the surrounding context already uses Unicode (sign glyphs in configs are fine).
-- Do not rely on `vim.lsp._set_clients`; tests should stub `Config.get_client` or `vim.lsp` methods directly.
+- Maintain ASCII unless the surrounding context already uses Unicode (icons in configs are fine).
 
 ## Useful Paths
 
-- Core diff logic: `lua/ajans/nes/diff.lua`
-- NES orchestration: `lua/ajans/nes/init.lua`
-- Treesitter helpers: `lua/ajans/treesitter.lua`
+- CLI orchestration: `lua/ajans/cli/init.lua`
+- CLI actions: `lua/ajans/cli/actions.lua`
+- CLI sessions: `lua/ajans/cli/session/init.lua`
 - Status integration: `lua/ajans/status.lua`
 - Tests entry point: `tests/minit.lua`
 
