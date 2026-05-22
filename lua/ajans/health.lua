@@ -17,42 +17,6 @@ function M.check()
     return
   end
 
-  local clients = Config.get_clients()
-
-  start("Ajans Copilot LSP")
-
-  local found = #clients > 0
-  for name in pairs(vim.lsp.config._configs) do
-    if Config.is_copilot(name) and vim.lsp.is_enabled(name) then
-      ok(("Copilot LSP `%s` is enabled"):format(name))
-      found = true
-    end
-  end
-  if not found then
-    error("No Copilot LSP server is enabled with `vim.lsp.enable(...)`")
-  end
-
-  local names = {} ---@type table<string,boolean>
-  for _, client in ipairs(clients) do
-    local cmd = vim.inspect(client.config.cmd):gsub("\\", "/")
-    if cmd:find("/copilot.lua/", 0, true) then
-      ok("Using `copilot.lua`'s bundled LSP server")
-    elseif cmd:find("/copilot.vim/", 0, true) then
-      ok("Using `copilot.vim`s bundled LSP server")
-    end
-    names[client.name] = true
-    if client.handlers["didChangeStatus"] == require("ajans.status").on_status then
-      ok("Ajans is handling Copilot LSP status notifications for client: " .. client.id)
-    else
-      error("Ajans is not handling Copilot LSP status notifications for client: " .. client.id)
-    end
-  end
-  if vim.tbl_count(names) > 1 then
-    error("You have multiple different LSP servers running: " .. table.concat(vim.tbl_map(function(n)
-      return "`" .. n .. "`"
-    end, names)))
-  end
-
   start("Ajans AI CLI")
   if vim.o.autoread then
     ok("autoread is enabled")

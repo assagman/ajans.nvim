@@ -8,29 +8,6 @@ local M = {}
 
 ---@type ajans.command.Cmd
 M.commands = {
-  nes = {
-    apply = function()
-      require("ajans.nes").apply()
-    end,
-    enable = function()
-      require("ajans.nes").enable(true)
-    end,
-    disable = function()
-      require("ajans.nes").enable(false)
-    end,
-    toggle = function()
-      require("ajans.nes").toggle()
-    end,
-    update = function()
-      require("ajans.nes").update()
-    end,
-    clear = function()
-      require("ajans.nes").clear()
-    end,
-    jump = function()
-      require("ajans.nes").jump()
-    end,
-  },
   cli = {
     show = function(opts)
       require("ajans.cli").show(opts)
@@ -56,25 +33,6 @@ M.commands = {
     prompt = function()
       require("ajans.cli").prompt()
     end,
-  },
-  debug = {
-    nes = {
-      add = function()
-        require("ajans.debug").nes_add()
-      end,
-      del = function()
-        require("ajans.debug").nes_del()
-      end,
-      patch = function()
-        require("ajans.debug").nes_patch()
-      end,
-      edit = function()
-        require("ajans.debug").nes_edit()
-      end,
-      inspect = function()
-        require("ajans.debug").nes_inspect()
-      end,
-    },
   },
 }
 
