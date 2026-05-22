@@ -8,15 +8,20 @@ local M = {}
 local cli_sessions = {} ---@type table<string, ajans.cli.Status>
 local cli_last_update = 0
 
+local function normalize_cli_session(id, session)
+  local tool = session.tool
+  return {
+    id = session.id or id,
+    tool = type(tool) == "table" and tool.name or tool,
+    cwd = session.cwd,
+  }
+end
+
 local function update_cli_status()
   local Session = require("ajans.cli.session")
   cli_sessions = {}
   for id, session in pairs(Session.attached()) do
-    cli_sessions[id] = {
-      id = session.id,
-      tool = session.tool.name,
-      cwd = session.cwd,
-    }
+    cli_sessions[id] = normalize_cli_session(id, session)
   end
 end
 
