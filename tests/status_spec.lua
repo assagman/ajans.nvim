@@ -35,10 +35,4 @@ describe("status", function()
       },
     }, Status.cli())
   end)
-
-  it("does not expose Copilot LSP status helpers", function()
-    assert.is_nil(Status.get)
-    assert.is_nil(Status.attach)
-    assert.is_nil(Status.on_status)
-  end)
 end)

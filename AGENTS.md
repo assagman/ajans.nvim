@@ -18,11 +18,6 @@ This repository contains `ajans.nvim`, a Neovim plugin that provides an integrat
 - Inspect Neovim help topics from the CLI:
 
   ```bash
-  # show all doc paths then grep for a topic
-  nvim --headless '+lua print(table.concat(vim.api.nvim_get_runtime_file("doc/*.txt", true), " "))' +qall \
-    | xargs rg "vim.text.diff" -C4
-
-  # jump straight to a help entry and print the next 50 lines
   nvim --headless \
     '+lua vim.cmd.help("nvim_buf_set_extmark"); print(table.concat(vim.api.nvim_buf_get_lines(0, vim.fn.line(".") - 1, vim.fn.line(".") + 50, false), "\n"))' +qa
   ```
@@ -45,8 +40,7 @@ This repository contains `ajans.nvim`, a Neovim plugin that provides an integrat
 
 - The repo may run in headless CI where network calls are blocked; stubs or fixtures should avoid third-party fetches.
 - Avoid touching generated docs directly—run `./scripts/docs` instead.
-- Maintain ASCII unless the surrounding context already uses Unicode (sign glyphs in configs are fine).
-- Do not rely on `vim.lsp._set_clients`; tests should stub public APIs directly.
+- Maintain ASCII unless the surrounding context already uses Unicode (icons in configs are fine).
 
 ## Useful Paths
 

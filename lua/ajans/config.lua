@@ -149,10 +149,13 @@ end
 
 ---@param opts? ajans.Config
 function M.setup(opts)
-  opts = vim.deepcopy(opts or {})
-  opts.nes = nil
-  opts.copilot = nil
-  config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts)
+  local user = {} ---@type ajans.Config
+  for key in pairs(defaults) do
+    if opts and opts[key] ~= nil then
+      user[key] = opts[key]
+    end
+  end
+  config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), user)
 
   vim.api.nvim_create_user_command("Ajans", function(args)
     require("ajans.commands").cmd(args)

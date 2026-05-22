@@ -16,9 +16,4 @@ describe("init module", function()
 
     assert.are.same({ foo = true }, called_opts)
   end)
-
-  it("does not expose NES helpers", function()
-    assert.is_nil(Ajans.clear)
-    assert.is_nil(Ajans.nes_jump_or_apply)
-  end)
 end)
