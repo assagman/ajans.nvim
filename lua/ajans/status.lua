@@ -40,10 +40,10 @@ end
 function M.cli()
   local now = vim.uv.now()
   if now - cli_last_update > 5000 then
+    cli_last_update = now
     -- update periodically to detect sessions where `is_running()` returns false
     -- can happen when an external process stopped
     update_cli_status()
-    cli_last_update = now
   end
   return vim.tbl_values(cli_sessions)
 end

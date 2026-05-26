@@ -13,7 +13,7 @@ and keep sessions alive inside your normal Neovim workflow.
   - 📦 **Pre-configured for Popular Tools**: Out-of-the-box support for Claude, Gemini, Grok, Codex, Copilot CLI, and more.
   - ✨ **Context-Aware Prompts**: Automatically include file content, cursor position, and diagnostics in your prompts.
   - 📝 **Prompt Library**: A library of pre-defined prompts for common tasks like explaining code, fixing issues, or writing tests.
-  - 🔄 **Session Persistence**: Keep your CLI sessions alive with `tmux` and `zellij` integration.
+  - 🔄 **Session Persistence**: Keep your CLI sessions alive with `tmux` integration.
   - 📂 **Automatic File Watching**: Automatically reloads files in Neovim when they are modified by AI tools.
 
 - **🔌 Extensible and Customizable**
@@ -26,6 +26,7 @@ and keep sessions alive inside your normal Neovim workflow.
 - **Neovim** `>= 0.11.2` or newer
 - [snacks.nvim](https://github.com/folke/snacks.nvim) for better prompt/tool selection **_(optional)_**
 - [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) **_(`main` branch)_** for `{function}` and `{class}` context variables **_(optional)_**
+- [tmux](https://github.com/tmux/tmux/wiki) for persistent CLI sessions
 - AI cli tools, such as Codex, Claude, Copilot, Gemini, … **_(optional)_**
   see the [🤖 AI CLI Integration](#-ai-cli-integration) section for details.
 - [lsof](https://man7.org/linux/man-pages/man8/lsof.8.html) and [ps](https://man7.org/linux/man-pages/man1/ps.1.html) are used
@@ -52,12 +53,6 @@ Install with your favorite manager. With [lazy.nvim](https://github.com/folke/la
   "assagman/ajans.nvim",
   opts = {
     -- add any options here
-    cli = {
-      mux = {
-        backend = "zellij",
-        enabled = true,
-      },
-    },
   },
   keys = {
     {
@@ -171,7 +166,7 @@ local defaults = {
         hide_ctrl_z   = { "<c-z>", "blur"      , mode = "nt", desc = "go back to the previous window without hiding the terminal" },
         prompt        = { "<c-p>", "prompt"    , mode = "t" , desc = "insert prompt or context" },
         stopinsert    = { "<c-q>", "stopinsert", mode = "t" , desc = "enter normal mode" },
-        normal_cr     = { "<cr>" , "insert_cr" , mode = "n" , desc = "send <cr> to the terminal and enter normal mode" },
+        normal_cr     = { "<cr>" , "insert_cr" , mode = "n" , desc = "send <cr> to the terminal and enter terminal mode" },
         -- Navigate windows in terminal mode. Only active when:
         -- * layout is not "float"
         -- * there is another window in the direction
@@ -187,14 +182,10 @@ local defaults = {
       nav = nil,
     },
     ---@class ajans.cli.Mux
-    ---@field backend? "tmux"|"zellij" Multiplexer backend to persist CLI sessions
     mux = {
-      backend = vim.env.ZELLIJ and "zellij" or "tmux", -- default to tmux unless zellij is detected
-      enabled = false,
-      -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
-      -- window: when run inside a terminal multiplexer, new sessions will be created in a new tab
-      -- split: when run inside a terminal multiplexer, new sessions will be created in a new split
-      -- NOTE: zellij only supports `terminal`
+      -- terminal: tmux sessions will be attached inside a Neovim terminal
+      -- window: when run inside tmux, new sessions will be created in a new window
+      -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
       split = {
         vertical = true, -- vertical or horizontal split
@@ -221,7 +212,7 @@ local defaults = {
       pi       = {},
       qwen     = {},
     },
-    --- Add custom context. See `lua/ajans/context/init.lua`
+    --- Add custom context. See `lua/ajans/cli/context/init.lua`
     ---@type table<string, ajans.context.Fn>
     context = {},
     ---@type table<string, ajans.Prompt|string|fun(ctx:ajans.context.ctx):(string?)>
@@ -270,10 +261,10 @@ local defaults = {
 
 ## 🤖 AI CLI Integration
 
-Ajans ships with a lightweight terminal wrapper so you can talk to local AI CLI
-tools without leaving Neovim. Each tool runs in its own scratch terminal window and
-shares helper prompts that bundle buffer context, the current cursor position, and
-diagnostics when requested.
+Ajans runs local AI CLI tools through tmux so sessions persist across Neovim
+windows and restarts. When needed, Ajans opens a lightweight Neovim terminal
+wrapper that attaches to the tmux session while helper prompts bundle buffer
+context, the current cursor position, and diagnostics.
 
 <!-- api_cli:start -->
 
@@ -508,6 +499,7 @@ Ajans preconfigures popular AI CLIs. Run `:checkhealth ajans` to see which ones 
 | [`gemini`](https://github.com/google-gemini/gemini-cli)     | Google Gemini CLI    | See [repo](https://github.com/google-gemini/gemini-cli)                                                                |
 | [`grok`](https://github.com/superagent-ai/grok-cli)         | xAI Grok CLI         | See [repo](https://github.com/superagent-ai/grok-cli)                                                                  |
 | [`opencode`](https://github.com/sst/opencode)               | OpenCode CLI         | `npm install -g opencode`                                                                                              |
+| [`pi`](https://github.com/badlogic/pi-mono)                 | Pi CLI agent         | See [repo](https://github.com/badlogic/pi-mono)                                                                        |
 | [`qwen`](https://github.com/QwenLM/qwen-code)               | Alibaba Qwen Code    | See [repo](https://github.com/QwenLM/qwen-code)                                                                        |
 
 > [!TIP]
@@ -653,18 +645,7 @@ in your statusline.
 
 ### Terminal sessions not persisting?
 
-Make sure you have tmux or zellij installed and enable the multiplexer:
-
-```lua
-opts = {
-  cli = {
-    mux = {
-      enabled = true,
-      backend = "tmux", -- or "zellij"
-    },
-  },
-}
-```
+Make sure you have tmux installed. Ajans always runs CLI sessions through tmux.
 
 ### Do I need a GitHub Copilot subscription?
 

@@ -6,7 +6,7 @@ local M = {}
 function M.send(picker)
   local Util = require("ajans.util")
   Util.deprecate('require("ajans.cli.snacks").send()', 'require("ajans.cli.picker.snacks").send()')
-  require("ajans.cli.picker.snacks").send(picker)
+  return require("ajans.cli.picker.snacks").send(picker)
 end
 
 return M

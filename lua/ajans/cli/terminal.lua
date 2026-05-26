@@ -97,8 +97,19 @@ end
 
 ---@param opts ajans.cli.session.Opts
 function M.new(opts)
-  opts.backend = "terminal"
-  return Session.new(opts) --[[@as ajans.cli.Terminal]]
+  assert(type(opts) == "table", "terminal sessions require opts")
+  assert(opts.mux_backend == "tmux", "terminal sessions require tmux")
+  local tool = opts.tool
+
+  tool = type(tool) == "string" and Config.get_tool(tool) or tool --[[@as ajans.cli.Tool]]
+  local self = setmetatable(opts, M) --[[@as ajans.cli.Terminal]]
+  self.tool = tool
+  self.cwd = Session.cwd(opts)
+  self.backend = "terminal"
+  self.sid = Session.sid({ tool = tool.name, cwd = self.cwd })
+  self.id = self.id or self.sid
+  self:init()
+  return self
 end
 
 function M:init()
@@ -116,6 +127,10 @@ function M:init()
 end
 
 function M:attach() end
+
+function M:is_attached()
+  return Session._attached[self.id] ~= nil
+end
 
 function M:is_running()
   return self.job and vim.fn.jobwait({ self.job }, 0)[1] == -1
@@ -163,7 +178,7 @@ function M:start()
       if not self:is_focused() then
         return
       end
-      -- schedule to make sure we're still in mormal mode and in the terminal window
+      -- schedule to make sure we're still in normal mode and in the terminal window
       vim.schedule(function()
         self.normal_mode = vim.fn.mode() ~= "t" and self:is_focused()
       end)
@@ -275,7 +290,10 @@ function M:start()
     end)
   )
 
-  self.timer = vim.uv.new_timer()
+  if self.timer and not self.timer:is_closing() then
+    self.timer:close()
+  end
+  self.timer = assert(vim.uv.new_timer(), "failed to create send timer")
 
   vim.api.nvim_win_call(self.win, function()
     ---@type table<string, string|false>
@@ -326,18 +344,16 @@ function M:fix_cursorline()
 end
 
 function M:on_ready()
+  if not self.timer then
+    return
+  end
   self.timer:start(0, SEND_DELAY, function()
     local next = table.remove(self.send_queue, 1) ---@type string?
     if next then
       next = next:gsub("\r\n", "\n") -- normalize line endings
       vim.schedule(function()
         if self:is_running() then
-          -- Use nvim_put to send input to the terminal
-          -- instead of nvim_chan_send to better simulate user input
-          -- vim.api.nvim_chan_send(self.job, next)
-          vim.api.nvim_buf_call(self.buf, function()
-            vim.api.nvim_put(vim.split(next, "\n", { plain = true }), "c", false, true)
-          end)
+          vim.api.nvim_chan_send(self.job, next)
           if self:is_focused() then
             vim.cmd.startinsert()
           end
@@ -517,10 +533,9 @@ function M:keys(buf)
       local action = type(rhs) == "function" and rhs or nil
       if type(rhs) == "string" then
         action = Actions[rhs] -- global actions
-          or M[rhs] -- terminal methods
-            and function()
-              M[rhs](self)
-            end
+          or (type(M[rhs]) == "function" and function()
+            M[rhs](self)
+          end)
           or (vim.fn.exists(":" .. rhs) > 0 and function()
             vim.cmd[rhs]()
           end)

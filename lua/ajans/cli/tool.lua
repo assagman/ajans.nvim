@@ -37,9 +37,15 @@ end
 function M:is_proc(proc)
   local is_proc = self.config.is_proc
   if type(is_proc) == "string" then
-    local re = vim.regex(is_proc)
-    is_proc = function(_, p)
-      return re:match_str(p.cmd) ~= nil
+    local ok, re = pcall(vim.regex, is_proc)
+    if ok then
+      is_proc = function(_, p)
+        return re:match_str(p.cmd) ~= nil
+      end
+    else
+      is_proc = function()
+        return false
+      end
     end
     self.config.is_proc = is_proc
   end

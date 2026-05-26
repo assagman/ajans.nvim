@@ -38,6 +38,33 @@ describe("commands", function()
         expected = { name = "copilot", foo = { a = 1, b = 2 } },
       },
       {
+        name = "does not expose the Neovim API table",
+        input = "api=vim",
+        expected = { api = "vim" },
+      },
+      {
+        name = "allows dotted string values",
+        input = 'msg="review foo.lua" url="https://example.com/docs"',
+        expected = { msg = "review foo.lua", url = "https://example.com/docs" },
+      },
+      {
+        name = "allows decimal values",
+        input = "temperature=1.2",
+        expected = { temperature = 1.2 },
+      },
+      {
+        name = "rejects field access in sandboxed args",
+        input = "api=vim.fn",
+        expected = nil,
+        error_patterns = { "field access is not allowed" },
+      },
+      {
+        name = "rejects string metatable field access",
+        input = 'api=("x").dump',
+        expected = nil,
+        error_patterns = { "field access is not allowed" },
+      },
+      {
         name = "reports invalid lua",
         input = "focus=",
         expected = nil,

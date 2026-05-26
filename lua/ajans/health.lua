@@ -1,5 +1,3 @@
-local Config = require("ajans.config")
-
 local M = {}
 
 local start = vim.health.start or vim.health.report_start
@@ -24,20 +22,10 @@ function M.check()
     warn("autoread is disabled, file changes from AI CLI tools will not be detected automatically")
   end
 
-  if Config.cli.mux.enabled then
-    ok("Terminal multiplexer integration is enabled")
+  if vim.fn.executable("tmux") == 1 then
+    ok("Terminal multiplexer `tmux` is installed")
   else
-    ok("Terminal multiplexer integration is disabled")
-  end
-
-  for _, mux in ipairs({ "tmux", "zellij" }) do
-    if vim.fn.executable(mux) == 1 then
-      ok("`" .. mux .. "` is installed")
-    elseif mux == Config.cli.mux.backend then
-      error("Multiplexer backend `" .. mux .. "` is not installed")
-    else
-      ok("`" .. mux .. "` is not installed, but it's not the configured backend")
-    end
+    error("Terminal multiplexer `tmux` is not installed")
   end
 
   if vim.fn.has("win32") == 0 then
@@ -56,10 +44,11 @@ function M.check()
   table.sort(tool_names)
   for _, name in ipairs(tool_names) do
     local tool = tools[name]
-    if vim.fn.executable(tool.cmd[1]) == 1 then
-      ok("`" .. tool.name .. "` is installed")
+    local tool_name = tool.name or name
+    if tool.cmd and #tool.cmd > 0 and vim.fn.executable(tool.cmd[1]) == 1 then
+      ok("`" .. tool_name .. "` is installed")
     else
-      warn("`" .. tool.name .. "` is not installed")
+      warn("`" .. tool_name .. "` is not installed")
     end
   end
 end

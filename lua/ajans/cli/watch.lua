@@ -6,11 +6,16 @@ M.watches = {} ---@type table<string, uv.uv_fs_event_t>>
 M.enabled = false
 M.changes = {} ---@type table<string, boolean>
 
+local MAX_CHANGES = 1000
+
 --- Refresh checktime and clear the changes log
 function M.refresh()
-  vim.cmd.checktime()
-  Util.debug("# Changes\n- " .. table.concat(vim.tbl_keys(M.changes), "\n- "))
+  local changes = vim.tbl_keys(M.changes)
   M.changes = {}
+  vim.cmd.checktime()
+  if #changes > 0 then
+    Util.debug("# Changes\n- " .. table.concat(changes, "\n- "))
+  end
 end
 
 --- Start watching a specific path
@@ -23,8 +28,11 @@ function M.start(path)
   local watch = assert(vim.uv.new_fs_event())
   local ok, err = watch:start(path, {}, function(_, file)
     if file then
-      M.changes[path .. "/" .. file] = true
-      M.refresh()
+      if vim.tbl_count(M.changes) >= MAX_CHANGES then
+        pcall(M.refresh)
+      end
+      M.changes[vim.fs.joinpath(path, file)] = true
+      pcall(M.refresh)
     end
   end)
   if not ok then

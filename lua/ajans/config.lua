@@ -41,7 +41,7 @@ local defaults = {
         hide_ctrl_z   = { "<c-z>", "blur"      , mode = "nt", desc = "go back to the previous window without hiding the terminal" },
         prompt        = { "<c-p>", "prompt"    , mode = "t" , desc = "insert prompt or context" },
         stopinsert    = { "<c-q>", "stopinsert", mode = "t" , desc = "enter normal mode" },
-        normal_cr     = { "<cr>" , "insert_cr" , mode = "n" , desc = "send <cr> to the terminal and enter normal mode" },
+        normal_cr     = { "<cr>" , "insert_cr" , mode = "n" , desc = "send <cr> to the terminal and enter terminal mode" },
         -- Navigate windows in terminal mode. Only active when:
         -- * layout is not "float"
         -- * there is another window in the direction
@@ -57,14 +57,10 @@ local defaults = {
       nav = nil,
     },
     ---@class ajans.cli.Mux
-    ---@field backend? "tmux"|"zellij" Multiplexer backend to persist CLI sessions
     mux = {
-      backend = vim.env.ZELLIJ and "zellij" or "tmux", -- default to tmux unless zellij is detected
-      enabled = false,
-      -- terminal: new sessions will be created for each CLI tool and shown in a Neovim terminal
-      -- window: when run inside a terminal multiplexer, new sessions will be created in a new tab
-      -- split: when run inside a terminal multiplexer, new sessions will be created in a new split
-      -- NOTE: zellij only supports `terminal`
+      -- terminal: tmux sessions will be attached inside a Neovim terminal
+      -- window: when run inside tmux, new sessions will be created in a new window
+      -- split: when run inside tmux, new sessions will be created in a new split
       create = "terminal", ---@type "terminal"|"window"|"split"
       split = {
         vertical = true, -- vertical or horizontal split
@@ -92,7 +88,7 @@ local defaults = {
       pi       = {},
       qwen     = {},
     },
-    --- Add custom context. See `lua/ajans/context/init.lua`
+    --- Add custom context. See `lua/ajans/cli/context/init.lua`
     ---@type table<string, ajans.context.Fn>
     context = {},
     -- stylua: ignore
@@ -142,6 +138,34 @@ local state_dir = vim.fn.stdpath("state") .. "/ajans"
 local config = vim.deepcopy(defaults) --[[@as ajans.Config]]
 M.augroup = vim.api.nvim_create_augroup("ajans", { clear = true })
 
+---@param mux any
+---@return any
+local function normalize_mux(mux)
+  if type(mux) ~= "table" then
+    return mux
+  end
+  local ret = {}
+  for key in pairs(defaults.cli.mux) do
+    if mux[key] ~= nil then
+      ret[key] = vim.deepcopy(mux[key])
+    end
+  end
+  if ret.split ~= nil then
+    if type(ret.split) == "table" then
+      local split = {}
+      for key in pairs(defaults.cli.mux.split) do
+        if ret.split[key] ~= nil then
+          split[key] = ret.split[key]
+        end
+      end
+      ret.split = split
+    else
+      ret.split = nil
+    end
+  end
+  return ret
+end
+
 ---@param name string
 function M.state(name)
   return state_dir .. "/" .. name
@@ -152,8 +176,11 @@ function M.setup(opts)
   local user = {} ---@type ajans.Config
   for key in pairs(defaults) do
     if opts and opts[key] ~= nil then
-      user[key] = opts[key]
+      user[key] = vim.deepcopy(opts[key])
     end
+  end
+  if user.cli and user.cli.mux then
+    user.cli.mux = normalize_mux(user.cli.mux)
   end
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), user)
 
@@ -189,7 +216,6 @@ function M.setup(opts)
     require("ajans.status").setup()
 
     M.validate("cli.win.layout", { "float", "left", "bottom", "top", "right" })
-    M.validate("cli.mux.backend", { "tmux", "zellij" })
     M.validate("cli.mux.create", { "terminal", "window", "split" })
   end)
 end

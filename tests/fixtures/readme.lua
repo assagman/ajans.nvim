@@ -2,12 +2,6 @@ local base = {
   "assagman/ajans.nvim",
   opts = {
     -- add any options here
-    cli = {
-      mux = {
-        backend = "zellij",
-        enabled = true,
-      },
-    },
   },
   -- stylua: ignore
   keys = {
