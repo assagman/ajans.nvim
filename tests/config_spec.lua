@@ -22,6 +22,21 @@ describe("config", function()
     assert.is_nil(Config.extra)
   end)
 
+  it("keeps default mux split options when user split config is not a table", function()
+    setup_config({
+      cli = {
+        mux = {
+          split = false,
+        },
+      },
+    })
+
+    assert.are.same({
+      vertical = true,
+      size = 0.5,
+    }, Config.cli.mux.split)
+  end)
+
   it("exposes only supported mux options", function()
     local opts = {
       cli = {

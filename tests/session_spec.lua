@@ -189,6 +189,17 @@ describe("session mux", function()
     assert.are.equal(terminal, states[1].session)
   end)
 
+  it("rejects invalid terminal session opts", function()
+    setup_config()
+
+    local ok, err = pcall(function()
+      require("ajans.cli.terminal").new()
+    end)
+
+    assert.is_false(ok)
+    assert.matches("terminal sessions require opts", tostring(err))
+  end)
+
   it("rejects direct non-tmux terminal sessions", function()
     setup_config()
 

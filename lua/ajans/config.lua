@@ -150,14 +150,18 @@ local function normalize_mux(mux)
       ret[key] = vim.deepcopy(mux[key])
     end
   end
-  if type(ret.split) == "table" then
-    local split = {}
-    for key in pairs(defaults.cli.mux.split) do
-      if ret.split[key] ~= nil then
-        split[key] = ret.split[key]
+  if ret.split ~= nil then
+    if type(ret.split) == "table" then
+      local split = {}
+      for key in pairs(defaults.cli.mux.split) do
+        if ret.split[key] ~= nil then
+          split[key] = ret.split[key]
+        end
       end
+      ret.split = split
+    else
+      ret.split = nil
     end
-    ret.split = split
   end
   return ret
 end
