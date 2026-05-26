@@ -533,10 +533,9 @@ function M:keys(buf)
       local action = type(rhs) == "function" and rhs or nil
       if type(rhs) == "string" then
         action = Actions[rhs] -- global actions
-          or M[rhs] -- terminal methods
-            and function()
-              M[rhs](self)
-            end
+          or (type(M[rhs]) == "function" and function()
+            M[rhs](self)
+          end)
           or (vim.fn.exists(":" .. rhs) > 0 and function()
             vim.cmd[rhs]()
           end)

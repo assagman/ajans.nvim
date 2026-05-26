@@ -44,10 +44,11 @@ function M.check()
   table.sort(tool_names)
   for _, name in ipairs(tool_names) do
     local tool = tools[name]
-    if vim.fn.executable(tool.cmd[1]) == 1 then
-      ok("`" .. tool.name .. "` is installed")
+    local tool_name = tool.name or name
+    if tool.cmd and #tool.cmd > 0 and vim.fn.executable(tool.cmd[1]) == 1 then
+      ok("`" .. tool_name .. "` is installed")
     else
-      warn("`" .. tool.name .. "` is not installed")
+      warn("`" .. tool_name .. "` is not installed")
     end
   end
 end

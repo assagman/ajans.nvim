@@ -43,6 +43,12 @@ describe("commands", function()
         expected = { api = "vim" },
       },
       {
+        name = "rejects field access in sandboxed args",
+        input = "api=vim.fn",
+        expected = nil,
+        error_patterns = { "field access is not allowed" },
+      },
+      {
         name = "reports invalid lua",
         input = "focus=",
         expected = nil,

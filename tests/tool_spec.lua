@@ -14,7 +14,7 @@ describe("cli tool runtime configs", function()
   it("loads every bundled tool config from aj runtime path", function()
     local Tool = require("ajans.cli.tool")
     local process_cmds = {
-      amazon_q = "qchat",
+      amazon_q = "chat_cli",
       copilot = "copilot --banner",
     }
     local runtime_files = vim.api.nvim_get_runtime_file("aj/cli/*.lua", true)
@@ -48,7 +48,8 @@ end)
 
 describe("cli tool formatting", function()
   it("Gemini and Qwen formatters return escaped text", function()
-    for _, file in ipairs({ "aj/cli/gemini.lua", "aj/cli/qwen.lua" }) do
+    for _, name in ipairs({ "gemini", "qwen" }) do
+      local file = vim.api.nvim_get_runtime_file("aj/cli/" .. name .. ".lua", false)[1]
       local config = dofile(file)
       local text = { { { "foo bar", "AjansLocFile" } } }
 

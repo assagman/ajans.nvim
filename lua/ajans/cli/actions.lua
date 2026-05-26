@@ -23,7 +23,7 @@ end
 function M.insert_cr()
   vim.schedule(function()
     vim.cmd.startinsert() -- needed, since otherwise Neovim will do this
-    vim.api.nvim_input("<cr>")
+    vim.api.nvim_feedkeys(vim.keycode("<cr>"), "nx", false)
   end)
 end
 

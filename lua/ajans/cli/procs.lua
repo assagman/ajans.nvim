@@ -173,7 +173,10 @@ function P:children(pid)
   local children = self._children[pid] or {}
   local ret = {} ---@type ajans.cli.Proc[]
   for _, cpid in ipairs(children) do
-    ret[#ret + 1] = self:get(cpid)
+    local proc = self:get(cpid)
+    if proc then
+      ret[#ret + 1] = proc
+    end
   end
   return ret
 end

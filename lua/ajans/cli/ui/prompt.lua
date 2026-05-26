@@ -79,13 +79,15 @@ function M.select(opts)
     kind = "ajans_prompt",
     ---@param item ajans.select_prompt.Item
     format_item = function(item)
-      return ("[%s] %s"):format(item.name, string.rep(" ", 18 - #item.name) .. item.prompt.msg)
+      local padding = math.max(0, 18 - #item.name)
+      return ("[%s] %s"):format(item.name, string.rep(" ", padding) .. item.prompt.msg)
     end,
     snacks = {
       format = function(item)
         local ret = {} ---@type snacks.picker.Highlight[]
+        local padding = math.max(0, 18 - #item.name)
         ret[#ret + 1] = { item.name, "Title" }
-        ret[#ret + 1] = { string.rep(" ", 18 - #item.name) }
+        ret[#ret + 1] = { string.rep(" ", padding) }
         vim.list_extend(ret, tpl(item.prompt.msg))
         return ret
       end,

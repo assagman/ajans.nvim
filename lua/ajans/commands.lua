@@ -54,6 +54,9 @@ function M.argparse(str, opts)
     return (opts or {}).error ~= false and Util.error(("Invalid args: `%s`\nError: %s"):format(str, err))
   end
   xpcall(function()
+    if str:find("[%w_]+%s*[%.:]%s*[%w_]+") then
+      return on_error("field access is not allowed")
+    end
     local chunk, err = load(str, "ajans", "t", env)
     return chunk and (chunk() or true) or on_error(err)
   end, on_error)

@@ -29,7 +29,7 @@ function M.start(path)
   local ok, err = watch:start(path, {}, function(_, file)
     if file then
       if vim.tbl_count(M.changes) >= MAX_CHANGES then
-        M.changes = {}
+        pcall(M.refresh)
       end
       M.changes[vim.fs.joinpath(path, file)] = true
       pcall(M.refresh)
