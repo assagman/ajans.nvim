@@ -73,6 +73,7 @@ end
 function M.select(opts)
   opts = opts or {}
   opts = type(opts) == "function" and { cb = opts } or opts --[[@as ajans.cli.Select]]
+  opts.filter = opts.filter or {}
   opts.cb = opts.cb
     or function(state)
       if state then

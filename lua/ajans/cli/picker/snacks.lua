@@ -8,9 +8,9 @@ local M = {}
 function M.open(source, cb, opts)
   Snacks.picker.pick(
     source,
-    vim.tbl_extend("force", {
+    vim.tbl_extend("force", opts or {}, {
       confirm = M.action(cb),
-    }, opts or {})
+    })
   )
 end
 

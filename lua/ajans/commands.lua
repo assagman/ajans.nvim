@@ -37,6 +37,36 @@ M.commands = {
 }
 
 ---@param str string
+---@return string
+local function strip_strings(str)
+  local ret = {} ---@type string[]
+  local i = 1
+  while i <= #str do
+    local char = str:sub(i, i)
+    if char == '"' or char == "'" then
+      ret[#ret + 1] = char
+      i = i + 1
+      while i <= #str do
+        local inner = str:sub(i, i)
+        if inner == "\\" then
+          i = i + 2
+        elseif inner == char then
+          ret[#ret + 1] = char
+          i = i + 1
+          break
+        else
+          i = i + 1
+        end
+      end
+    else
+      ret[#ret + 1] = char
+      i = i + 1
+    end
+  end
+  return table.concat(ret)
+end
+
+---@param str string
 ---@param opts? {error?: boolean}
 function M.argparse(str, opts)
   ---@type ajans.command.Args
@@ -54,7 +84,12 @@ function M.argparse(str, opts)
     return (opts or {}).error ~= false and Util.error(("Invalid args: `%s`\nError: %s"):format(str, err))
   end
   xpcall(function()
-    if str:find("[%w_]+%s*[%.:]%s*[%w_]+") then
+    local code = strip_strings(str)
+    if
+      code:find("[%a_][%w_]*%s*[%.:]%s*[%a_][%w_]*")
+      or code:find("[%)%}%]]%s*[%.:]%s*[%a_]")
+      or code:find("[\"']%s*[%.:]%s*[%a_]")
+    then
       return on_error("field access is not allowed")
     end
     local chunk, err = load(str, "ajans", "t", env)

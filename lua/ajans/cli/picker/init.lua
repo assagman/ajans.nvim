@@ -51,8 +51,6 @@ function M.send_cb(opts)
   end
 end
 
-M._send_cb = M.send_cb
-
 ---@param source string
 ---@param opts? ajans.context.loc.Opts|ajans.cli.Send
 ---@param popts? table

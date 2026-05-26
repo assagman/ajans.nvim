@@ -5,12 +5,16 @@ describe("cli picker", function()
   local original_snacks_picker
   local original_telescope_actions
   local original_telescope_state
+  local original_snacks_picker_util
+  local original_global_snacks
 
   before_each(function()
     original_snacks = package.loaded.snacks
     original_snacks_picker = package.loaded["ajans.cli.picker.snacks"]
     original_telescope_actions = package.loaded["telescope.actions"]
     original_telescope_state = package.loaded["telescope.actions.state"]
+    original_snacks_picker_util = package.loaded["snacks.picker.util"]
+    original_global_snacks = _G.Snacks
   end)
 
   after_each(function()
@@ -18,6 +22,8 @@ describe("cli picker", function()
     package.loaded["ajans.cli.picker.snacks"] = original_snacks_picker
     package.loaded["telescope.actions"] = original_telescope_actions
     package.loaded["telescope.actions.state"] = original_telescope_state
+    package.loaded["snacks.picker.util"] = original_snacks_picker_util
+    _G.Snacks = original_global_snacks
     pcall(vim.api.nvim_del_user_command, "Ajans")
   end)
 
@@ -58,6 +64,41 @@ describe("cli picker", function()
     })
 
     assert.are.equal("/tmp/project", ret[#ret][1])
+  end)
+
+  it("keeps the required Snacks confirm callback", function()
+    local SnacksPicker = require("ajans.cli.picker.snacks")
+    local confirm
+    local called = false
+    package.loaded["snacks.picker.util"] = {
+      path = function(item)
+        return item.name
+      end,
+    }
+    _G.Snacks = {
+      picker = {
+        pick = function(_, opts)
+          confirm = opts.confirm
+        end,
+      },
+    }
+
+    SnacksPicker.open("files", function()
+      called = true
+    end, {
+      confirm = function()
+        error("caller confirm should not replace Ajans callback")
+      end,
+    })
+
+    confirm({
+      selected = function()
+        return { { name = "file.lua" } }
+      end,
+      close = function() end,
+    })
+
+    assert.is_true(called)
   end)
 
   it("validates required select options", function()
