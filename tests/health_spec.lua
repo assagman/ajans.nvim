@@ -58,7 +58,7 @@ describe("health", function()
     package.loaded["ajans.health"] = nil
     require("ajans.health").check()
 
-    assert.are.same({ "`tmux` is not installed" }, errors)
+    assert.are.same({ "Terminal multiplexer `tmux` is not installed" }, errors)
     assert.is_false(vim.tbl_contains(oks, "Terminal multiplexer integration is disabled"))
   end)
 end)

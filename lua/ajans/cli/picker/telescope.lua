@@ -41,7 +41,13 @@ function M.action(cb)
     if #picker:get_multi_selection() > 0 then
       vim.list_extend(items, picker:get_multi_selection())
     else
-      items[1] = action_state.get_selected_entry()
+      local entry = action_state.get_selected_entry()
+      if entry then
+        items[1] = entry
+      end
+    end
+    if #items == 0 then
+      return
     end
     ---@param item telescope.Item
     cb(vim.tbl_map(function(item)
@@ -58,7 +64,7 @@ function M.action(cb)
 end
 
 function M.send(prompt_bufnr)
-  M.action(require("ajans.cli.picker")._send_cb())(prompt_bufnr)
+  M.action(require("ajans.cli.picker").send_cb())(prompt_bufnr)
 end
 
 return M

@@ -134,19 +134,25 @@ function M.sessions()
     for _, s in pairs(backend:sessions()) do
       s.backend = name
       s.started = true
-      ret[#ret + 1] = M.new(s)
-      assert(not ids[s.id], "duplicate session id: " .. s.id)
-      ids[s.id] = true
-      if M._attached[s.id] then
-        M._attached[s.id] = ret[#ret] -- update to latest session instance
+      if ids[s.id] then
+        Util.error("duplicate session id: " .. s.id)
+      else
+        ret[#ret + 1] = M.new(s)
+        ids[s.id] = true
+        if M._attached[s.id] then
+          M._attached[s.id] = ret[#ret] -- update to latest session instance
+        end
       end
     end
   end
   for id, session in pairs(M._attached) do
     if session.backend == "terminal" and session.mux_backend == "tmux" and session:is_running() then
-      ret[#ret + 1] = session
-      assert(not ids[id], "duplicate session id: " .. id)
-      ids[id] = true
+      if ids[id] then
+        Util.error("duplicate session id: " .. id)
+      else
+        ret[#ret + 1] = session
+        ids[id] = true
+      end
     end
   end
   for id in pairs(M._attached) do
@@ -193,7 +199,9 @@ function M.attach(session)
     session:start()
   end
   M._attached[session.id] = session
-  Util.emit("AjansCliAttach", { id = session.id })
+  vim.schedule(function()
+    Util.emit("AjansCliAttach", { id = session.id })
+  end)
   return session
 end
 

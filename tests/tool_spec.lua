@@ -45,3 +45,21 @@ describe("cli tool runtime configs", function()
     assert.is_false(tool:is_proc({ cmd = "/opt/bin/copilot-helper" }))
   end)
 end)
+
+describe("cli tool formatting", function()
+  it("Gemini and Qwen formatters return escaped text", function()
+    for _, file in ipairs({ "aj/cli/gemini.lua", "aj/cli/qwen.lua" }) do
+      local config = dofile(file)
+      local text = { { { "foo bar", "AjansLocFile" } } }
+
+      assert.are.equal("foo\\ bar", config.format(text))
+    end
+  end)
+
+  it("does not abort matching for invalid process regex patterns", function()
+    local Tool = require("ajans.cli.tool")
+    local tool = setmetatable({ config = { is_proc = "(" } }, Tool)
+
+    assert.is_false(tool:is_proc({ cmd = "anything" }))
+  end)
+end)

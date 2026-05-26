@@ -41,7 +41,7 @@ M.commands = {
 function M.argparse(str, opts)
   ---@type ajans.command.Args
   local ret, ok = {}, true
-  local env = setmetatable({ vim = vim }, {
+  local env = setmetatable({}, {
     __newindex = function(_, k, v)
       ret[k] = v
     end,

@@ -29,24 +29,19 @@ function M.env(pid)
     end
   end
 
-  if not have_ps then
-    return
-  end
-
-  -- try ps as a fallback (macOS and others)
-  local lines = Util.exec({ "ps", "eww", "-p", tostring(pid) })
-  if lines and #lines > 0 then
-    -- ps eww output format: PID command ENV1=val1 ENV2=val2 ...
-    local line = lines[1]
-    -- Skip the PID and command, extract environment variables
-    for env_var in line:gmatch("(%w+=[^%s]+)") do
-      local k, v = env_var:match("^(.-)=(.*)$")
-      if k and v then
+  if have_ps then
+    -- try ps as a fallback (macOS and others)
+    local lines = Util.exec({ "ps", "eww", "-p", tostring(pid) })
+    if lines and #lines > 0 then
+      -- ps eww output is space-delimited, so values with spaces are best-effort.
+      local line = lines[1]
+      for k, v in line:gmatch("([%w_]+)=([^%s]+)") do
         env[k] = v
       end
     end
   end
-  return env
+
+  return next(env) and env or nil
 end
 
 ---@param pid number

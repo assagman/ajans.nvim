@@ -38,6 +38,11 @@ describe("commands", function()
         expected = { name = "copilot", foo = { a = 1, b = 2 } },
       },
       {
+        name = "does not expose the Neovim API table",
+        input = "api=vim",
+        expected = { api = "vim" },
+      },
+      {
         name = "reports invalid lua",
         input = "focus=",
         expected = nil,

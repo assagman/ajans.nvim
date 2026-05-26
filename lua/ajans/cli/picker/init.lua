@@ -21,25 +21,23 @@ function M.get(picker)
   for _, name in ipairs(pickers) do
     ---@type boolean, ajans.Picker
     local ok, mod = pcall(require, "ajans.cli.picker." .. name)
-    if not ok then
-      return Util.error("Invalid picker: " .. name)
-    end
-    if pcall(require, name) then
+    if ok and pcall(require, name) then
       return mod
     end
   end
-  Util.error("No valid picker found")
+  return Util.error(picker and ("Invalid picker: " .. picker) or "No valid picker found")
 end
 
 ---@param opts? ajans.context.loc.Opts|ajans.cli.Send
-function M._send_cb(opts)
+function M.send_cb(opts)
   opts = opts or {}
+  local loc_opts = { kind = opts.kind or "file" }
   ---@param items ajans.context.Loc[]
   return function(items)
     local Loc = require("ajans.cli.context.location")
     local ret = { { " " } } ---@type ajans.Text
     for _, item in ipairs(items) do
-      local file = Loc.get(item, { kind = opts.kind or "file" })[1]
+      local file = Loc.get(item, loc_opts)[1]
       if file then
         vim.list_extend(ret, file)
         ret[#ret + 1] = { " " }
@@ -53,12 +51,14 @@ function M._send_cb(opts)
   end
 end
 
+M._send_cb = M.send_cb
+
 ---@param source string
 ---@param opts? ajans.context.loc.Opts|ajans.cli.Send
 ---@param popts? table
 function M.open(source, opts, popts)
   local picker = M.get()
-  return picker and picker.open(source, M._send_cb(opts), popts)
+  return picker and picker.open(source, M.send_cb(opts), popts)
 end
 
 return M

@@ -22,12 +22,10 @@ function M.check()
     warn("autoread is disabled, file changes from AI CLI tools will not be detected automatically")
   end
 
-  ok("Terminal multiplexer integration uses `tmux`")
-
   if vim.fn.executable("tmux") == 1 then
-    ok("`tmux` is installed")
+    ok("Terminal multiplexer `tmux` is installed")
   else
-    error("`tmux` is not installed")
+    error("Terminal multiplexer `tmux` is not installed")
   end
 
   if vim.fn.has("win32") == 0 then

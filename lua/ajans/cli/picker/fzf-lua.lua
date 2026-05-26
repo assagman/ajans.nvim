@@ -47,7 +47,7 @@ function M.action(cb)
 end
 
 function M.send(selected, opts)
-  M.action(require("ajans.cli.picker")._send_cb())(selected, opts)
+  M.action(require("ajans.cli.picker").send_cb())(selected, opts)
 end
 
 return M

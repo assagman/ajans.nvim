@@ -55,13 +55,26 @@ end
 ---@param ms? number
 ---@return T
 function M.debounce(fn, ms)
-  local timer = assert(vim.uv.new_timer())
+  local timer ---@type uv.uv_timer_t?
   return function(...)
     local args = { ... }
+    if timer and not timer:is_closing() then
+      timer:stop()
+      timer:close()
+    end
+    timer = assert(vim.uv.new_timer())
+    local active = timer
     timer:start(
       ms or 20,
       0,
       vim.schedule_wrap(function()
+        if not active:is_closing() then
+          active:stop()
+          active:close()
+        end
+        if timer == active then
+          timer = nil
+        end
         pcall(fn, unpack(args))
       end)
     )
@@ -95,7 +108,7 @@ function M.exit_visual_mode()
   return kind, mode
 end
 
---- Exit visual mode if in visual mode, and return the type of visual mode exited.
+--- Check if in visual mode and return the visual mode type.
 ---@return ajans.VisualMode?, string?
 function M.visual_mode()
   ---@alias ajans.VisualMode "char"|"line"|"block"

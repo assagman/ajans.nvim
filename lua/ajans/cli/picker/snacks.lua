@@ -8,9 +8,9 @@ local M = {}
 function M.open(source, cb, opts)
   Snacks.picker.pick(
     source,
-    vim.tbl_extend("force", opts or {}, {
+    vim.tbl_extend("force", {
       confirm = M.action(cb),
-    })
+    }, opts or {})
   )
 end
 
@@ -27,7 +27,7 @@ function M.action(cb)
         name = require("snacks.picker.util").path(item),
         row = pos and pos[1] or nil,
         col = pos and pos[2] or nil,
-        range = end_pos and { from = pos, to = end_pos } or nil,
+        range = (pos and end_pos) and { from = pos, to = end_pos } or nil,
       }
     end
     picker:close()
@@ -37,7 +37,7 @@ end
 
 ---@type snacks.picker.Action.fn
 function M.send(picker)
-  M.action(require("ajans.cli.picker")._send_cb())(picker)
+  M.action(require("ajans.cli.picker").send_cb())(picker)
 end
 
 return M

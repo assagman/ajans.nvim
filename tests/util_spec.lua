@@ -81,3 +81,54 @@ describe("split_chars", function()
     end)
   end
 end)
+
+describe("debounce", function()
+  local original_new_timer
+  local original_schedule_wrap
+
+  before_each(function()
+    original_new_timer = vim.uv.new_timer
+    original_schedule_wrap = vim.schedule_wrap
+  end)
+
+  after_each(function()
+    vim.uv.new_timer = original_new_timer
+    vim.schedule_wrap = original_schedule_wrap
+  end)
+
+  it("closes superseded and fired timers", function()
+    local timers = {}
+    vim.schedule_wrap = function(cb)
+      return cb
+    end
+    vim.uv.new_timer = function()
+      local timer = { closed = false }
+      function timer:start(_, _, cb)
+        self.cb = cb
+      end
+      function timer:stop()
+        self.stopped = true
+      end
+      function timer:close()
+        self.closed = true
+      end
+      function timer:is_closing()
+        return self.closed
+      end
+      timers[#timers + 1] = timer
+      return timer
+    end
+
+    local calls = 0
+    local debounced = Util.debounce(function()
+      calls = calls + 1
+    end, 10)
+    debounced()
+    debounced()
+    timers[2].cb()
+
+    assert.is_true(timers[1].closed)
+    assert.is_true(timers[2].closed)
+    assert.are.equal(1, calls)
+  end)
+end)

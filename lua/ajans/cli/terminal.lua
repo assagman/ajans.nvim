@@ -178,7 +178,7 @@ function M:start()
       if not self:is_focused() then
         return
       end
-      -- schedule to make sure we're still in mormal mode and in the terminal window
+      -- schedule to make sure we're still in normal mode and in the terminal window
       vim.schedule(function()
         self.normal_mode = vim.fn.mode() ~= "t" and self:is_focused()
       end)
@@ -290,7 +290,10 @@ function M:start()
     end)
   )
 
-  self.timer = vim.uv.new_timer()
+  if self.timer and not self.timer:is_closing() then
+    self.timer:close()
+  end
+  self.timer = assert(vim.uv.new_timer(), "failed to create send timer")
 
   vim.api.nvim_win_call(self.win, function()
     ---@type table<string, string|false>
@@ -341,18 +344,16 @@ function M:fix_cursorline()
 end
 
 function M:on_ready()
+  if not self.timer then
+    return
+  end
   self.timer:start(0, SEND_DELAY, function()
     local next = table.remove(self.send_queue, 1) ---@type string?
     if next then
       next = next:gsub("\r\n", "\n") -- normalize line endings
       vim.schedule(function()
         if self:is_running() then
-          -- Use nvim_put to send input to the terminal
-          -- instead of nvim_chan_send to better simulate user input
-          -- vim.api.nvim_chan_send(self.job, next)
-          vim.api.nvim_buf_call(self.buf, function()
-            vim.api.nvim_put(vim.split(next, "\n", { plain = true }), "c", false, true)
-          end)
+          vim.api.nvim_chan_send(self.job, next)
           if self:is_focused() then
             vim.cmd.startinsert()
           end

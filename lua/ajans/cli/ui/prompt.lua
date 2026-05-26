@@ -11,6 +11,7 @@ local M = {}
 ---@param opts ajans.cli.Prompt
 function M.select(opts)
   assert(type(opts) == "table", "opts must be a table")
+  assert(type(opts.cb) == "function", "opts.cb must be a function")
   local prompts = vim.tbl_keys(Config.cli.prompts) ---@type string[]
   table.sort(prompts)
   local context = Context.get()

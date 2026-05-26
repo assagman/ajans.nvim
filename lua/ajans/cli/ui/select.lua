@@ -10,6 +10,8 @@ local M = {}
 ---@param opts ajans.cli.Select
 function M.select(opts)
   assert(type(opts) == "table", "opts must be a table")
+  assert(type(opts.cb) == "function", "opts.cb must be a function")
+  assert(opts.filter ~= nil, "opts.filter is required")
   local tools = require("ajans.cli.state").get(opts.filter)
 
   ---@param state? ajans.cli.State
@@ -107,7 +109,7 @@ function M.format(state, picker)
     len = 12 + sw(backend)
     ret[#ret + 1] = { string.rep(" ", 40 - len) }
     if picker then
-      local item = setmetatable({}, state) --[[@as snacks.picker.Item]]
+      local item = setmetatable({}, { __index = state }) --[[@as snacks.picker.Item]]
       item.file = state.session.cwd
       item.dir = true
       vim.list_extend(ret, require("snacks").picker.format.filename(item, picker))

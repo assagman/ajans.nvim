@@ -166,19 +166,37 @@ end
 
 ---Send text to a tmux pane
 function M:send(text)
-  local function send()
-    local buffer = "ajans-" .. self.tmux_pane_id
-    Util.exec({ "tmux", "load-buffer", "-b", buffer, "-" }, { stdin = text })
-    Util.exec({ "tmux", "paste-buffer", "-b", buffer, "-d", "-r", "-t", self.tmux_pane_id })
+  self._send_queue = self._send_queue or {}
+  self._send_queue[#self._send_queue + 1] = text
+  if self._sending then
+    return
   end
 
-  if self.tool.mux_focus then
-    -- Send focus-in event first (some TUI apps like qwen ignore input when unfocused)
-    Util.exec({ "tmux", "send-keys", "-t", self.tmux_pane_id, "Escape", "[", "I" })
-    vim.defer_fn(send, 50) -- slight delay to ensure focus event is processed first
-  else
-    send()
+  local function drain()
+    local next = table.remove(self._send_queue, 1)
+    if not next then
+      self._sending = false
+      return
+    end
+    self._sending = true
+
+    local function send()
+      local buffer = "ajans-" .. self.tmux_pane_id
+      Util.exec({ "tmux", "load-buffer", "-b", buffer, "-" }, { stdin = next })
+      Util.exec({ "tmux", "paste-buffer", "-b", buffer, "-d", "-r", "-t", self.tmux_pane_id })
+      drain()
+    end
+
+    if self.tool.mux_focus then
+      -- Send focus-in event first (some TUI apps like qwen ignore input when unfocused)
+      Util.exec({ "tmux", "send-keys", "-t", self.tmux_pane_id, "Escape", "[", "I" })
+      vim.defer_fn(send, 50) -- slight delay to ensure focus event is processed first
+    else
+      send()
+    end
   end
+
+  drain()
 end
 
 ---Send text to a tmux pane
