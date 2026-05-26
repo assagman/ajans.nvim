@@ -186,7 +186,7 @@ local defaults = {
       -- terminal: tmux sessions will be attached inside a Neovim terminal
       -- window: when run inside tmux, new sessions will be created in a new window
       -- split: when run inside tmux, new sessions will be created in a new split
-      create = "terminal", ---@type "terminal"|"window"|"split"
+      create = "split", ---@type "terminal"|"window"|"split"
       split = {
         vertical = true, -- vertical or horizontal split
         size = 0.5, -- size of the split (0-1 for percentage)
