@@ -97,7 +97,9 @@ end
 
 ---@param opts ajans.cli.session.Opts
 function M.new(opts)
+  assert(opts.mux_backend == "tmux", "terminal sessions require tmux")
   local tool = opts.tool
+
   tool = type(tool) == "string" and Config.get_tool(tool) or tool --[[@as ajans.cli.Tool]]
   local self = setmetatable(opts, M) --[[@as ajans.cli.Terminal]]
   self.tool = tool
@@ -124,6 +126,10 @@ function M:init()
 end
 
 function M:attach() end
+
+function M:is_attached()
+  return Session._attached[self.id] ~= nil
+end
 
 function M:is_running()
   return self.job and vim.fn.jobwait({ self.job }, 0)[1] == -1

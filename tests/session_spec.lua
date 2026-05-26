@@ -2,6 +2,7 @@
 
 local Config = require("ajans.config")
 local Session = require("ajans.cli.session")
+local State = require("ajans.cli.state")
 local Util = require("ajans.util")
 
 local function setup_config(opts)
@@ -162,6 +163,44 @@ describe("session mux", function()
         return session.id
       end, sessions))
     )
+  end)
+
+  it("reports attached tmux terminal wrappers through state refresh", function()
+    setup_config()
+    local Terminal = require("ajans.cli.terminal")
+    Terminal.terminals = {}
+    local terminal = Terminal.new({
+      tool = test_tool(),
+      cwd = vim.uv.cwd(),
+      id = "terminal: claude abc",
+      mux_backend = "tmux",
+      mux_session = "claude abc",
+      parent = { dump = function() end },
+    })
+    terminal.is_running = function()
+      return true
+    end
+    Session._attached[terminal.id] = terminal
+
+    local states = State.get({ attached = true })
+
+    assert.are.equal(1, #states)
+    assert.is_true(states[1].attached)
+    assert.are.equal(terminal, states[1].session)
+  end)
+
+  it("rejects direct non-tmux terminal sessions", function()
+    setup_config()
+
+    local ok, err = pcall(function()
+      require("ajans.cli.terminal").new({
+        tool = test_tool(),
+        cwd = vim.uv.cwd(),
+      })
+    end)
+
+    assert.is_false(ok)
+    assert.matches("terminal sessions require tmux", tostring(err))
   end)
 
   it("wraps tmux start commands in terminal sessions", function()
