@@ -23,7 +23,7 @@ sessions alive inside your normal Neovim workflow.
 
 FEATURES                                *ajans.nvim-ajans.nvim-features*
 
-- Integrated AI CLI terminal for Claude, Gemini, Grok, Codex, Copilot CLI,
+- Integrated AI CLI terminal for Claude, Antigravity, Grok, Codex, Copilot CLI,
   and other tools.
 - Context-aware prompts for buffers, files, selections, cursor positions,
   diagnostics, quickfix entries, functions, and classes.
@@ -40,7 +40,7 @@ REQUIREMENTS                        *ajans.nvim-ajans.nvim-requirements*
 - nvim-treesitter-textobjects main branch for `{function}` and `{class}`
   context variables (optional)
 - tmux for persistent CLI sessions
-- AI CLI tools such as Codex, Claude, Copilot, Gemini, etc. (optional)
+- AI CLI tools such as Codex, Claude, Copilot, Antigravity, etc. (optional)
 - lsof and ps on Unix-like systems for running process and port detection
   (optional, but recommended)
 
@@ -91,9 +91,9 @@ Configure with:
           create = "split",
         },
         tools = {
+          antigravity = {},
           claude = {},
           codex = {},
-          gemini = {},
           copilot = {},
         },
       },

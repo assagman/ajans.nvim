@@ -10,7 +10,7 @@ and keep sessions alive inside your normal Neovim workflow.
 
 - **💬 Integrated AI CLI Terminal**
   - 🚀 **Direct Access to AI CLIs**: Interact with your favorite AI command-line tools without leaving Neovim.
-  - 📦 **Pre-configured for Popular Tools**: Out-of-the-box support for Claude, Gemini, Grok, Codex, Copilot CLI, and more.
+  - 📦 **Pre-configured for Popular Tools**: Out-of-the-box support for Claude, Antigravity, Grok, Codex, Copilot CLI, and more.
   - ✨ **Context-Aware Prompts**: Automatically include file content, cursor position, and diagnostics in your prompts.
   - 📝 **Prompt Library**: A library of pre-defined prompts for common tasks like explaining code, fixing issues, or writing tests.
   - 🔄 **Session Persistence**: Keep your CLI sessions alive with `tmux` integration.
@@ -27,7 +27,7 @@ and keep sessions alive inside your normal Neovim workflow.
 - [snacks.nvim](https://github.com/folke/snacks.nvim) for better prompt/tool selection **_(optional)_**
 - [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) **_(`main` branch)_** for `{function}` and `{class}` context variables **_(optional)_**
 - [tmux](https://github.com/tmux/tmux/wiki) for persistent CLI sessions
-- AI cli tools, such as Codex, Claude, Copilot, Gemini, … **_(optional)_**
+- AI cli tools, such as Codex, Claude, Copilot, Antigravity, … **_(optional)_**
   see the [🤖 AI CLI Integration](#-ai-cli-integration) section for details.
 - [lsof](https://man7.org/linux/man-pages/man8/lsof.8.html) and [ps](https://man7.org/linux/man-pages/man1/ps.1.html) are used
   on Unix-like systems to detect running AI CLI tool sessions. **_(optional, but recommended)_**
@@ -36,7 +36,7 @@ and keep sessions alive inside your normal Neovim workflow.
 
 1. **Install** the plugin with your package manager (see below)
 2. **Check health**: `:checkhealth ajans`
-3. **Install at least one AI CLI tool** such as Claude, Codex, Gemini, or Copilot CLI
+3. **Install at least one AI CLI tool** such as Claude, Codex, Antigravity, or Copilot CLI
 4. **Try it out**:
    - Use `<leader>aa` to open your current AI CLI session
    - Use `<leader>as` to select a specific tool
@@ -201,12 +201,12 @@ local defaults = {
     tools = {
       aider    = {},
       amazon_q = {},
+      antigravity = {},
       claude   = {},
       codex    = {},
       copilot  = {},
       crush    = {},
       cursor   = {},
-      gemini   = {},
       grok     = {},
       opencode = {},
       pi       = {},
@@ -491,12 +491,12 @@ Ajans preconfigures popular AI CLIs. Run `:checkhealth ajans` to see which ones 
 | ----------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | [`aider`](https://github.com/Aider-AI/aider)                | AI pair programmer   | `pip install aider-chat` or `pipx install aider-chat`                                                                  |
 | [`amazon_q`](https://github.com/aws/amazon-q-developer-cli) | Amazon Q Developer   | [Install guide](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-getting-started-installing.html) |
+| [`antigravity`](https://antigravity.google)                  | Antigravity CLI      | See [docs](https://antigravity.google)                                                                                 |
 | [`claude`](https://github.com/anthropics/claude-code)       | Claude Code CLI      | [See Claude Code docs](https://code.claude.com/docs/en/overview#get-started)
 | [`codex`](https://github.com/openai/codex)                  | OpenAI Codex CLI     | See [OpenAI docs](https://github.com/openai/codex)                                                                     |
 | [`copilot`](https://github.com/github/copilot-cli)          | GitHub Copilot CLI   | `npm install -g @githubnext/github-copilot-cli`                                                                        |
 | [`crush`](https://github.com/charmbracelet/crush)           | Charm's AI assistant | See [installation](https://github.com/charmbracelet/crush)                                                             |
 | [`cursor`](https://cursor.com/cli)                          | Cursor CLI agent     | See [Cursor docs](https://cursor.com/cli)                                                                              |
-| [`gemini`](https://github.com/google-gemini/gemini-cli)     | Google Gemini CLI    | See [repo](https://github.com/google-gemini/gemini-cli)                                                                |
 | [`grok`](https://github.com/superagent-ai/grok-cli)         | xAI Grok CLI         | See [repo](https://github.com/superagent-ai/grok-cli)                                                                  |
 | [`opencode`](https://github.com/sst/opencode)               | OpenCode CLI         | `npm install -g opencode`                                                                                              |
 | [`pi`](https://github.com/badlogic/pi-mono)                 | Pi CLI agent         | See [repo](https://github.com/badlogic/pi-mono)                                                                        |
