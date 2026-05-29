@@ -1,8 +1,8 @@
 ---@type ajans.cli.Config
 return {
-  cmd = { "gemini" },
-  is_proc = "\\<gemini\\>",
-  url = "https://github.com/google-gemini/gemini-cli",
+  cmd = { "agy" },
+  is_proc = "\\<agy\\>",
+  url = "https://github.com/google-deepmind/antigravity-cli",
   format = function(text)
     local Text = require("ajans.text")
     Text.transform(text, function(str)

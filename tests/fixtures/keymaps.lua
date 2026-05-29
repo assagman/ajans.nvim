@@ -85,10 +85,10 @@ local keymaps = {
     ["<C-c>"] = "Interrupt the current operation or generation",
     ["<C-d>"] = "Exit the Cursor CLI (if pressed on empty prompt, acts as EOF)",
   },
-  gemini = {
+  antigravity = {
     ["<Esc>"] = "Close any open dialog or suggestion popup",
     ["<C-c>"] = "Cancel the ongoing request or generation (press twice to quit)",
-    ["<C-d>"] = "Exit the Gemini CLI (if input is empty, requires confirmation)",
+    ["<C-d>"] = "Exit the Antigravity CLI (if input is empty, requires confirmation)",
     ["<C-l>"] = "Clear the terminal output",
     ["<C-o>"] = "Toggle the debug console display",
     ["<C-s>"] = "Allow long responses to fully print (disable output truncation)",
