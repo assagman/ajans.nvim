@@ -9,6 +9,7 @@ Contributor notes for ajans.nvim.
 | `lua/ajans/config.lua` | Defaults, setup, validation, highlights. |
 | `lua/ajans/commands.lua` | `:Ajans` command parser. |
 | `lua/ajans/cli/init.lua` | Public CLI Lua API. |
+| `lua/ajans/cli/actions.lua` | Built-in CLI terminal action handlers used by keymaps. |
 | `lua/ajans/cli/session/` | tmux-backed sessions. |
 | `lua/ajans/cli/terminal.lua` | Neovim terminal wrapper. |
 | `lua/ajans/cli/context/` | Prompt context providers. |
