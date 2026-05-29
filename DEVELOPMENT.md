@@ -17,7 +17,7 @@ Contributor notes for ajans.nvim.
 | `tests/` | mini.test suite. |
 | `tests/fixtures/readme.lua` | Generated documentation snippets. |
 | `lua/ajans/docs.lua` | Docs generation script. |
-| `doc/ajans.nvim.txt` | Vim help file. |
+| `doc/ajans.nvim.txt` | Neovim help file for `:help ajans.nvim`; `.txt` is standard Vim helpdoc format. |
 
 ## Commands
 
@@ -37,6 +37,12 @@ Notes:
 ## Generated docs
 
 Do not edit generated blocks directly. Update source, then run `./scripts/docs`.
+
+`lua/ajans/docs.lua` maps generated snippets to split docs with `Docs.save(...)`:
+
+- config reference -> `CONFIG.md`
+- suggested user keymaps -> `KEYMAPS.md`
+- CLI API, statusline, and picker examples -> `USAGE.md`
 
 | Marker | Target file | Source |
 | --- | --- | --- |

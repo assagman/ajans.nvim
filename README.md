@@ -1,12 +1,15 @@
 # ajans.nvim
 
-Neovim sidecar for AI CLI tools.
+Tmux-first Neovim sidecar for AI CLI tools.
 
-`ajans.nvim` is a simplified fork of [sidekick.nvim](https://github.com/folke/sidekick.nvim). It keeps the scope narrow: run local AI CLIs from Neovim, send editor context, and keep sessions alive with tmux.
+`ajans.nvim` is a simplified fork of [sidekick.nvim](https://github.com/folke/sidekick.nvim). It keeps the scope narrow: run local AI CLIs through tmux, send editor context, and keep sessions alive across Neovim restarts.
+
+Ajans is tmux-only. AI agents run in tmux sessions/panes, not as Neovim jobs. Neovim attaches through a lightweight terminal wrapper; when Neovim is already inside tmux, Ajans can also use native tmux splits or windows.
 
 ## What it does
 
-- Opens supported AI CLI tools in a Neovim terminal wrapper.
+- Runs supported AI CLI tools through tmux sessions and panes.
+- Opens a Neovim terminal wrapper that attaches to tmux when you want the session inside Neovim.
 - Reuses tmux sessions so CLI work survives window changes and Neovim restarts.
 - Sends verified editor context: file locations, cursor/range positions, selections, diagnostics, quickfix entries, buffers, functions, and classes.
 - Provides prompt, tool, file, and buffer pickers.
@@ -43,23 +46,14 @@ Add your preferred mappings from [KEYMAPS.md](./KEYMAPS.md).
 
 ## Quick start
 
-```vim
-:Ajans cli select
-:Ajans cli toggle
-:Ajans cli send msg="{this}"
-:Ajans cli prompt
-```
+After adding mappings from [KEYMAPS.md](./KEYMAPS.md):
 
-Common Lua calls:
+- `<leader>as` selects or starts a tmux-backed AI CLI session.
+- `<leader>aa` toggles the Neovim terminal wrapper attached to that session.
+- `<leader>at`, `<leader>af`, and `<leader>av` send current context.
+- `<leader>ap` opens the prompt/context picker.
 
-```lua
-require("ajans.cli").select()
-require("ajans.cli").toggle()
-require("ajans.cli").send({ msg = "{selection}" })
-require("ajans.cli").prompt()
-```
-
-Use `{selection}` when you want to send selected code. Use `{file}`, `{line}`, `{position}`, or `{this}` when you want to send location context.
+Use `{selection}` when you want to send selected code. Use `{file}`, `{line}`, `{position}`, or `{this}` when you want to send location context. Command and Lua API equivalents live in [USAGE.md](./USAGE.md).
 
 ## Supported CLI tools
 
@@ -71,11 +65,12 @@ Run `:checkhealth ajans` to see which tools are installed.
 
 ## Documentation
 
-- [USAGE.md](./USAGE.md) — commands, prompts, context variables, pickers, statusline, troubleshooting
+- [USAGE.md](./USAGE.md) — keymap-first workflow, commands, prompts, context variables, pickers, statusline, troubleshooting
 - [CONFIG.md](./CONFIG.md) — setup options, tool config, custom prompts, custom context
 - [KEYMAPS.md](./KEYMAPS.md) — suggested user mappings and default terminal mappings
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — internals and data flow
 - [DEVELOPMENT.md](./DEVELOPMENT.md) — contributor workflow and validation
+- `:help ajans.nvim` — in-editor Vim help reference from [`doc/ajans.nvim.txt`](./doc/ajans.nvim.txt)
 
 ## Scope
 

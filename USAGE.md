@@ -1,30 +1,42 @@
 # Usage
 
-Ajans centers on one workflow: select or start an AI CLI, then send it editor context.
+Ajans centers on one workflow: use keymaps to select a tmux-backed AI CLI, attach to it, then send editor context.
 
-## Basic workflow
+Ajans does not create global keymaps by itself. The examples below assume the suggested mappings from [KEYMAPS.md](./KEYMAPS.md).
 
-1. Start or attach to a tool.
+## Keymap-first workflow
 
-   ```vim
-   :Ajans cli select
-   ```
+1. Select or start a tool with `<leader>as`.
 
-2. Toggle the terminal wrapper.
+   This finds supported CLI tools and attaches to an existing tmux session when one is already running.
 
-   ```vim
-   :Ajans cli toggle
-   ```
+2. Toggle the CLI view with `<leader>aa`.
 
-3. Send context.
+   Ajans opens a Neovim terminal wrapper attached to the tmux session. The AI CLI itself keeps running in tmux.
 
-   ```vim
-   :Ajans cli send msg="{selection}"
-   :Ajans cli send msg="Review {file}"
-   :Ajans cli prompt
-   ```
+3. Send context from your editor.
 
-## Commands
+   | Key | Mode | Sends |
+   | --- | --- | --- |
+   | `<leader>at` | normal, visual | `{this}`: current location, or selection from non-file buffers |
+   | `<leader>af` | normal | `{file}`: current file location |
+   | `<leader>av` | visual | `{selection}`: selected text |
+   | `<leader>ap` | normal, visual | prompt picker |
+
+4. Work inside the CLI terminal wrapper when needed.
+
+   | Key | Mode | Action |
+   | --- | --- | --- |
+   | `<c-.>` | normal, terminal, insert, visual | focus/hide Ajans |
+   | `<c-p>` | terminal | insert prompt or context |
+   | `<c-f>` | normal, terminal | pick files and send locations |
+   | `<c-b>` | normal, terminal | pick buffers and send locations |
+   | `<c-q>` | terminal | enter terminal normal mode |
+   | `<c-q>` or `q` | normal | hide terminal wrapper |
+
+Use [KEYMAPS.md](./KEYMAPS.md) for full suggested mappings and default terminal-window mappings.
+
+## Command reference
 
 Ajans exposes one command namespace:
 
@@ -51,7 +63,7 @@ Available CLI commands:
 - `send`
 - `prompt`
 
-## Lua API
+## Lua API reference
 
 Generated from `lua/ajans/cli/init.lua` by `./scripts/docs`.
 

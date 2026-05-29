@@ -21,6 +21,10 @@ Table of Contents                            *ajans.nvim-table-of-contents*
 workflows in Neovim. Start or attach to CLI tools, send editor context, and
 keep sessions alive with tmux.
 
+This file is the in-editor Neovim help reference. Open it with
+`:help ajans.nvim`. The `.txt` extension follows Neovim's standard helpdoc
+format for files under `doc/`.
+
 FEATURES                                *ajans.nvim-ajans.nvim-features*
 
 - Integrated AI CLI terminal for Claude, Antigravity, Grok, Codex, Copilot CLI,
