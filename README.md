@@ -496,7 +496,7 @@ Ajans preconfigures popular AI CLIs. Run `:checkhealth ajans` to see which ones 
 | [`copilot`](https://github.com/github/copilot-cli)          | GitHub Copilot CLI   | `npm install -g @githubnext/github-copilot-cli`                                                                        |
 | [`crush`](https://github.com/charmbracelet/crush)           | Charm's AI assistant | See [installation](https://github.com/charmbracelet/crush)                                                             |
 | [`cursor`](https://cursor.com/cli)                          | Cursor CLI agent     | See [Cursor docs](https://cursor.com/cli)                                                                              |
-| [`antigravity`](https://github.com/google-deepmind/antigravity-cli) | Antigravity CLI      | See [repo](https://github.com/google-deepmind/antigravity-cli)                                                         |
+| [`antigravity`](https://antigravity.google)                  | Antigravity CLI      | See [docs](https://antigravity.google)                                                                                 |
 | [`grok`](https://github.com/superagent-ai/grok-cli)         | xAI Grok CLI         | See [repo](https://github.com/superagent-ai/grok-cli)                                                                  |
 | [`opencode`](https://github.com/sst/opencode)               | OpenCode CLI         | `npm install -g opencode`                                                                                              |
 | [`pi`](https://github.com/badlogic/pi-mono)                 | Pi CLI agent         | See [repo](https://github.com/badlogic/pi-mono)                                                                        |

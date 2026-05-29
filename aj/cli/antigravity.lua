@@ -2,7 +2,7 @@
 return {
   cmd = { "agy" },
   is_proc = "\\<agy\\>",
-  url = "https://github.com/google-deepmind/antigravity-cli",
+  url = "https://antigravity.google",
   format = function(text)
     local Text = require("ajans.text")
     Text.transform(text, function(str)

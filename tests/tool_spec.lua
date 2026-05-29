@@ -47,7 +47,7 @@ describe("cli tool runtime configs", function()
 end)
 
 describe("cli tool formatting", function()
-  it("Agy and Qwen formatters return escaped text", function()
+  it("Antigravity and Qwen formatters return escaped text", function()
     for _, name in ipairs({ "antigravity", "qwen" }) do
       local file = vim.api.nvim_get_runtime_file("aj/cli/" .. name .. ".lua", false)[1]
       local config = dofile(file)
