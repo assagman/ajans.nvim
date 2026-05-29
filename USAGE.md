@@ -1,0 +1,319 @@
+# Usage
+
+Ajans centers on one workflow: use keymaps to select a tmux-backed AI CLI, attach to it, then send editor context.
+
+Ajans does not create global keymaps by itself. The examples below assume the suggested mappings from [KEYMAPS.md](./KEYMAPS.md).
+
+## Keymap-first workflow
+
+1. Select or start a tool with `<leader>as`.
+
+   This finds supported CLI tools and attaches to an existing tmux session when one is already running.
+
+2. Toggle the CLI view with `<leader>aa`.
+
+   Ajans opens a Neovim terminal wrapper attached to the tmux session. The AI CLI itself keeps running in tmux.
+
+3. Send context from your editor.
+
+   | Key | Mode | Sends |
+   | --- | --- | --- |
+   | `<leader>at` | normal, visual | `{this}`: current location, or selection from non-file buffers |
+   | `<leader>af` | normal | `{file}`: current file location |
+   | `<leader>av` | visual | `{selection}`: selected text |
+   | `<leader>ap` | normal, visual | prompt picker |
+
+4. Work inside the CLI terminal wrapper when needed.
+
+   | Key | Mode | Action |
+   | --- | --- | --- |
+   | `<c-.>` | normal, terminal, insert, visual | focus/hide Ajans |
+   | `<c-p>` | terminal | insert prompt or context |
+   | `<c-f>` | normal, terminal | pick files and send locations |
+   | `<c-b>` | normal, terminal | pick buffers and send locations |
+   | `<c-q>` | terminal | enter terminal normal mode |
+   | `<c-q>` or `q` | normal | hide terminal wrapper |
+
+Use [KEYMAPS.md](./KEYMAPS.md) for full suggested mappings and default terminal-window mappings.
+
+## Command reference
+
+Ajans exposes one command namespace:
+
+```vim
+:Ajans cli <command> [args]
+```
+
+Arguments are Lua-style assignments:
+
+```vim
+:Ajans cli show name=claude focus=true
+:Ajans cli send msg="{selection}"
+:'<,'>Ajans cli send msg="{selection}"
+```
+
+Available CLI commands:
+
+- `show`
+- `toggle`
+- `hide`
+- `close`
+- `focus`
+- `select`
+- `send`
+- `prompt`
+
+## Lua API reference
+
+Generated from `lua/ajans/cli/init.lua` by `./scripts/docs`.
+
+<!-- api_cli:start -->
+
+<table><tr><th>Cmd</th><th>Lua</th></tr>
+<tr><td><code>:Ajans cli close</code> </td><td>
+
+
+```lua
+---@param opts? ajans.cli.Hide
+---@overload fun(name: string)
+require("ajans.cli").close(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli focus</code> Toggle focus of the terminal window if it is already open</td><td>
+
+
+```lua
+---@param opts? ajans.cli.Show
+---@overload fun(name: string)
+require("ajans.cli").focus(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli hide</code> </td><td>
+
+
+```lua
+---@param opts? ajans.cli.Hide
+---@overload fun(name: string)
+require("ajans.cli").hide(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli prompt</code> Select a prompt to send</td><td>
+
+
+```lua
+---@param opts? ajans.cli.Prompt|{cb:nil}
+---@overload fun(cb:fun(msg?:string))
+require("ajans.cli").prompt(opts)
+```
+
+</td></tr>
+<tr><td> Render a message template or prompt</td><td>
+
+
+```lua
+---@param opts? ajans.cli.Message|string
+require("ajans.cli").render(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli select</code> Start or attach to a CLI tool</td><td>
+
+
+```lua
+---@param opts? ajans.cli.Select|{cb:nil}|{focus?:boolean}
+---@overload fun(cb:fun(state?:ajans.cli.State))
+require("ajans.cli").select(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli send</code> Send a message or prompt to a CLI</td><td>
+
+
+```lua
+---@param opts? ajans.cli.Send
+---@overload fun(msg:string)
+require("ajans.cli").send(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli show</code> </td><td>
+
+
+```lua
+---@param opts? ajans.cli.Show
+---@overload fun(name: string)
+require("ajans.cli").show(opts)
+```
+
+</td></tr>
+<tr><td><code>:Ajans cli toggle</code> </td><td>
+
+
+```lua
+---@param opts? ajans.cli.Show
+---@overload fun(name: string)
+require("ajans.cli").toggle(opts)
+```
+
+</td></tr>
+</table>
+
+<!-- api_cli:end -->
+
+## Context variables
+
+Context variables render inside prompt strings.
+
+| Variable | Meaning |
+| --- | --- |
+| `{position}` | Current file location with line and column. |
+| `{file}` | Current file location only. |
+| `{line}` | Current file line location. |
+| `{buffers}` | Listed file buffers as locations. |
+| `{diagnostics}` | Diagnostics for current buffer; limited to visual range when a range exists. |
+| `{diagnostics_all}` | Diagnostics across all buffers. |
+| `{quickfix}` | Current quickfix list with locations and messages. |
+| `{selection}` | Current visual selection text. |
+| `{function}` | Function textobject location at cursor; requires `nvim-treesitter-textobjects`. |
+| `{class}` | Class textobject location at cursor; requires `nvim-treesitter-textobjects`. |
+| `{this}` | Special variable: file buffers resolve to `{position}`; non-file buffers resolve to literal `this` plus `{selection}`. |
+
+Use fallbacks when a context may be unavailable:
+
+```text
+{function|line}
+{class|file}
+```
+
+Use `{selection}` when you want code text. `{file}`, `{line}`, `{position}`, and `{this}` send locations, not whole file contents.
+
+## Built-in prompts
+
+Defined in `lua/ajans/config.lua`:
+
+| Prompt | Template |
+| --- | --- |
+| `changes` | `Can you review my changes?` |
+| `diagnostics` | `Can you help me fix the diagnostics in {file}?\n{diagnostics}` |
+| `diagnostics_all` | `Can you help me fix these diagnostics?\n{diagnostics_all}` |
+| `document` | <code>Add documentation to {function&#124;line}</code> |
+| `explain` | `Explain {this}` |
+| `fix` | `Can you fix {this}?` |
+| `optimize` | `How can {this} be optimized?` |
+| `review` | `Can you review {file} for any issues or improvements?` |
+| `tests` | `Can you write tests for {this}?` |
+
+Simple context prompts also exist for `buffers`, `file`, `line`, `position`, `quickfix`, `selection`, `function`, and `class`.
+
+## Pickers
+
+Ajans can use snacks.nvim, Telescope, or fzf-lua for file and buffer picker actions.
+
+Inside the CLI terminal wrapper:
+
+- `<c-f>` opens a file picker and sends selected file locations.
+- `<c-b>` opens a buffer picker and sends selected buffer locations.
+
+### Snacks picker action
+
+Generated from `tests/fixtures/readme.lua` by `./scripts/docs`.
+
+<!-- snacks_picker:start -->
+
+```lua
+{
+  "folke/snacks.nvim",
+  optional = true,
+  opts = {
+    picker = {
+      actions = {
+        ajans_send = function(...)
+          return require("ajans.cli.picker.snacks").send(...)
+        end,
+      },
+      win = {
+        input = {
+          keys = {
+            ["<a-a>"] = {
+              "ajans_send",
+              mode = { "n", "i" },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+<!-- snacks_picker:end -->
+
+With that config, `<a-a>` in a Snacks picker sends selected items to the active CLI session.
+
+## Statusline
+
+`require("ajans.status").cli()` returns attached CLI sessions as tables with `id`, `tool`, and `cwd`.
+
+Generated lualine example:
+
+<!-- setup_lualine:start -->
+
+```lua
+{
+  "nvim-lualine/lualine.nvim",
+  opts = function(_, opts)
+    opts.sections = opts.sections or {}
+    opts.sections.lualine_x = opts.sections.lualine_x or {}
+
+    -- CLI session status
+    table.insert(opts.sections.lualine_x, 2, {
+      function()
+        local status = require("ajans.status").cli()
+        return " " .. (#status > 1 and #status or "")
+      end,
+      cond = function()
+        return #require("ajans.status").cli() > 0
+      end,
+      color = function()
+        return "Special"
+      end,
+    })
+  end,
+}
+```
+
+<!-- setup_lualine:end -->
+
+## File watching
+
+When `cli.watch = true`, Ajans watches directories for loaded file buffers while CLI terminals are active. On file-system changes, it runs `:checktime`.
+
+For automatic reloads, enable Neovim `autoread`:
+
+```vim
+:set autoread
+```
+
+## Troubleshooting
+
+### Tool missing
+
+1. Run `:checkhealth ajans`.
+2. Verify executable exists, for example `which claude`.
+3. Try running the CLI directly outside Neovim.
+4. Check `:messages`.
+
+### Session not persisting
+
+Install tmux. Ajans uses tmux for CLI sessions.
+
+### Picker action fails
+
+Install one supported picker or set `cli.picker` to one you have installed: `"snacks"`, `"telescope"`, or `"fzf-lua"`.
+
+### Function/class context empty
+
+Install `nvim-treesitter-textobjects` on its `main` branch and ensure the current filetype has textobject queries.

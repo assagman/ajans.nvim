@@ -5,13 +5,22 @@ function M.update()
   local config = Docs.extract("lua/ajans/config.lua", "\n(--@class ajans%.Config.-\n})")
   config = config:gsub("%s*debug = false,.-\n", "\n")
 
+  -- Save generated config reference into CONFIG.md.
   Docs.save({
     config = config,
+  }, "CONFIG.md")
+
+  -- Save suggested user keymaps into KEYMAPS.md.
+  Docs.save({
     setup_base = Docs.extract("tests/fixtures/readme.lua", "local base = ({.-\n})"),
+  }, "KEYMAPS.md")
+
+  -- Save CLI API, statusline, and picker references into USAGE.md.
+  Docs.save({
+    api_cli = { content = M.mod("cli") },
     setup_lualine = Docs.extract("tests/fixtures/readme.lua", "local lualine = ({.-\n})"),
     snacks_picker = Docs.extract("tests/fixtures/readme.lua", "local snacks_picker = ({.-\n})"),
-    api_cli = { content = M.mod("cli") },
-  })
+  }, "USAGE.md")
 end
 
 ---@param mod string
