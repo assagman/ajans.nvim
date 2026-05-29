@@ -91,9 +91,9 @@ Configure with:
           create = "split",
         },
         tools = {
+          antigravity = {},
           claude = {},
           codex = {},
-          antigravity = {},
           copilot = {},
         },
       },
