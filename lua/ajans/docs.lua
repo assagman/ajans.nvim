@@ -7,11 +7,17 @@ function M.update()
 
   Docs.save({
     config = config,
+  }, "CONFIG.md")
+
+  Docs.save({
     setup_base = Docs.extract("tests/fixtures/readme.lua", "local base = ({.-\n})"),
+  }, "KEYMAPS.md")
+
+  Docs.save({
+    api_cli = { content = M.mod("cli") },
     setup_lualine = Docs.extract("tests/fixtures/readme.lua", "local lualine = ({.-\n})"),
     snacks_picker = Docs.extract("tests/fixtures/readme.lua", "local snacks_picker = ({.-\n})"),
-    api_cli = { content = M.mod("cli") },
-  })
+  }, "USAGE.md")
 end
 
 ---@param mod string

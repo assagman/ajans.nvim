@@ -17,9 +17,9 @@ Table of Contents                            *ajans.nvim-table-of-contents*
 ==============================================================================
 1. ajans.nvim                                 *ajans.nvim-ajans.nvim*
 
-**ajans.nvim** is your Neovim AI ajans for working with AI CLI tools without
-leaving your editor. Chat with assistants, send rich buffer context, and keep
-sessions alive inside your normal Neovim workflow.
+**ajans.nvim** is a simplified fork of sidekick.nvim focused on local AI CLI
+workflows in Neovim. Start or attach to CLI tools, send editor context, and
+keep sessions alive with tmux.
 
 FEATURES                                *ajans.nvim-ajans.nvim-features*
 
@@ -30,7 +30,7 @@ FEATURES                                *ajans.nvim-ajans.nvim-features*
 - Prompt library for common tasks such as explaining code, fixing issues,
   reviews, tests, and documentation.
 - Session persistence with tmux.
-- Automatic file watching for changes made by AI tools.
+- File watching that runs `:checktime` after external changes.
 - Picker actions and statusline helpers for plugin integration.
 
 REQUIREMENTS                        *ajans.nvim-ajans.nvim-requirements*
@@ -41,7 +41,7 @@ REQUIREMENTS                        *ajans.nvim-ajans.nvim-requirements*
   context variables (optional)
 - tmux for persistent CLI sessions
 - AI CLI tools such as Codex, Claude, Copilot, Antigravity, etc. (optional)
-- lsof and ps on Unix-like systems for running process and port detection
+- lsof and ps on Unix-like systems for running-session discovery
   (optional, but recommended)
 
 QUICK START                          *ajans.nvim-ajans.nvim-quick-start*
@@ -104,8 +104,9 @@ AI CLI INTEGRATION            *ajans.nvim-ajans.nvim-ai-cli-integration*
 
 Ajans runs local AI CLI tools through tmux so sessions persist across Neovim
 windows and restarts. When needed, Ajans opens a lightweight Neovim terminal
-wrapper that attaches to the tmux session while helper prompts bundle buffer
-context, current cursor position, and diagnostics.
+wrapper that attaches to the tmux session while helper prompts can include
+locations, selections, diagnostics, quickfix entries, buffers, functions, and
+classes.
 
 API summary:
 
